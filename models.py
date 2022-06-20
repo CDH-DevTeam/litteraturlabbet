@@ -21,9 +21,7 @@ class Author(abstract.AbstractBaseModel, mixins.GenderedMixin):
     surname = models.CharField(blank=True, null=True, max_length=128, verbose_name=_("litteraturlabbet.author.surname"))
 
     birth_year = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name=_("litteraturlabbet.author.birth_year"))
-    birth_year_plain = models.CharField(blank=True, null=True, max_length=4, verbose_name=_("litteraturlabbet.author.birth_year_plain"))
     death_year = models.PositiveSmallIntegerField(blank=True, null=True, verbose_name=_("litteraturlabbet.author.death_year"))
-    death_year_plain = models.CharField(blank=True, null=True,max_length=4, verbose_name=_("litteraturlabbet.author.death_year_plain"))
 
 
 class Work(abstract.AbstractBaseModel):
@@ -36,11 +34,15 @@ class Work(abstract.AbstractBaseModel):
     lbworkid = models.CharField(unique=True, max_length=128, verbose_name=_("litteraturlabbet.work.lbworkid"))
     librisid = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("litteraturlabbet.work.librisid")) 
 
-    author   = models.ForeignKey(Author, verbose_name=_("litteraturlabbet.work.author"), on_delete=models.CASCADE)
+    main_author   = models.ForeignKey(Author, blank=True, null=True, verbose_name=_("litteraturlabbet.work.author"), on_delete=models.CASCADE)
+    authors  = models.ManyToManyField(Author, related_name='works', verbose_name=_("litteraturlabbet.work.authors"))
 
     edition  = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("litteraturlabbet.work.edition"))
 
     language = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("litteraturlabbet.work.language"))
+
+    imprint_year = models.PositiveSmallIntegerField(default=None, blank=True, null=True, verbose_name=_("litteraturlabbet.work.imprint_year"))
+    sort_year    = models.PositiveSmallIntegerField(default=None, blank=True, null=True, verbose_name=_("litteraturlabbet.work.sort_year"))
     
     word_count = models.PositiveIntegerField(verbose_name=_("litteraturlabbet.work.word_count"), blank=True, null=True, )
 
@@ -75,7 +77,7 @@ class Segment(abstract.AbstractBaseModel):
     begin = models.PositiveIntegerField(verbose_name=_("litteraturlabbet.segment.begin"))
     end = models.PositiveIntegerField(verbose_name=_("litteraturlabbet.segment.end"))
 
-    cluster = models.ForeignKey(Cluster, verbose_name=_("litteraturlabbet.segment.cluster"), on_delete=models.CASCADE)
+    cluster = models.ForeignKey(Cluster, verbose_name=_("litteraturlabbet.segment.cluster"), on_delete=models.CASCADE, related_name='segments')
     page = models.ForeignKey(Page, verbose_name=_("litteraturlabbet.segment.page"), on_delete=models.CASCADE)
     text = models.TextField(default="", verbose_name=_("litteraturlabbet.segment.text"))
 
