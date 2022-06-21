@@ -5,6 +5,7 @@
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+import uuid
 from django.db import models
 import diana.abstract.models as abstract
 import diana.abstract.mixins as mixins
@@ -64,13 +65,13 @@ class Page(abstract.AbstractDocumentModel):
 
 class Cluster(abstract.AbstractBaseModel):
 
-    id = models.IntegerField(unique=True, primary_key=True)
+    id = models.PositiveBigIntegerField(unique=True, primary_key=True)
     size = models.PositiveIntegerField(verbose_name=_("litteraturlabbet.cluster.size"))
 
 class Segment(abstract.AbstractBaseModel):
     
-    uid = models.IntegerField(unique=True)
-    gid = models.IntegerField(unique=True)
+    uid = models.CharField(max_length=256, default="")
+    gid = models.CharField(max_length=256, default="")
 
     bw = models.PositiveIntegerField(verbose_name=_("litteraturlabbet.segment.bw"))
     ew = models.PositiveIntegerField(verbose_name=_("litteraturlabbet.segment.ew"))

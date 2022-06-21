@@ -12,5 +12,5 @@ urlpatterns = [
     path('', include(router.urls)),
 
     # Automatically generated views
-    *utils.get_model_urls('litteraturlabbet', 'api', exclude=['segment', 'page']),
+    *utils.get_model_urls('litteraturlabbet', 'api', exclude=[]),
 ]
