@@ -23,3 +23,28 @@ class WorkPageSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
         fields = get_fields(models.Work, exclude=DEFAULT_EXCLUDE + ['text_vector']) + ['pages']
         depth = 1
 
+class AuthorSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
+
+    class Meta:
+        model = models.Author
+        fields = get_fields(models.Author, exclude=DEFAULT_EXCLUDE)
+        depth = 1
+
+class SegmentSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
+
+    class Meta:
+        model = models.Segment
+        fields = "__all__"
+        depth = 0
+
+class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
+
+    # authors = AuthorSerializer(read_only=True, many=True)
+
+    segments = SegmentSerializer(read_only=True, many=True)
+    # authors = serializers.ListField(source='segments.page.work.authors', child=serializers.IntegerField())
+
+    class Meta:
+        model = models.Cluster
+        fields = get_fields(models.Cluster, exclude=DEFAULT_EXCLUDE) + ['segments']
+        # depth = 1

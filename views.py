@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, BaseFilterBackend
+from rest_framework.filters import SearchFilter, BaseFilterBackend, OrderingFilter
 from django_filters import rest_framework as filters
 from . import models, serializers
 from django.contrib.postgres.search import SearchQuery, SearchVector, SearchRank, SearchHeadline
@@ -82,6 +82,64 @@ class FragmentFilter(BaseFilterBackend):
         ]
 
 
+class WorkFilter(filters.FilterSet):
+    has_author = filters.NumberFilter(
+        field_name='authors__id',
+        lookup_expr='exact',
+    )
+
+    class Meta:
+        model = models.Work
+        fields = get_fields(models.Work, exclude=DEFAULT_EXCLUDE + ['page__text_vector', 'authors'])
+
+
+class ClusterFilter(filters.FilterSet):
+    has_author = filters.NumberFilter(
+        field_name='segments__page__work__authors__id',
+        lookup_expr='exact',
+        distinct=True
+    )
+
+
+    work = filters.NumberFilter(
+        field_name='segments__page__work__id',
+        lookup_expr='exact',
+        distinct=True
+    )
+    class Meta:
+        model = models.Cluster
+        fields = get_fields(models.Cluster, exclude=DEFAULT_EXCLUDE)
+
+
+class SegmentFilter(filters.FilterSet):
+    has_author = filters.NumberFilter(
+        field_name='page__work__authors__id',
+        lookup_expr='exact',
+        distinct=True
+    )
+
+    work = filters.NumberFilter(
+        field_name='page__work__id',
+        lookup_expr='exact',
+        distinct=True
+    )
+
+
+    class Meta:
+        model = models.Segment
+        fields = get_fields(models.Segment, exclude=DEFAULT_EXCLUDE)
+
+
+class AuthorFilter(filters.FilterSet):
+    # in_cluster = filters.NumberFilter(
+    #     field_name='works__pages__segments__cluster__id',
+    #     lookup_expr='exact',
+    # )
+
+    class Meta:
+        model = models.Author
+        fields = get_fields(models.Author, exclude=DEFAULT_EXCLUDE)
+
 
 class WorkPageViewSet(DynamicDepthViewSet):
     
@@ -89,7 +147,8 @@ class WorkPageViewSet(DynamicDepthViewSet):
     serializer_class = serializers.WorkPageSerializer
 
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = get_fields(models.Work, exclude=DEFAULT_EXCLUDE + ['page__text_vector'])
+    # filterset_fields = get_fields(models.Work, exclude=DEFAULT_EXCLUDE + ['page__text_vector'])
+    filter_class = WorkFilter
     search_fields = ['title', 'short_title', 'modernized_title', 'authors__name']
 
 
@@ -100,3 +159,30 @@ class PageViewSet(DynamicDepthViewSet):
     # GIS filters
     filter_backends = [DjangoFilterBackend, FragmentFilter]
     filterset_fields = get_fields(models.Page, exclude=DEFAULT_EXCLUDE + ['text_vector'])
+
+class AuthorViewSet(DynamicDepthViewSet):
+    queryset = models.Author.objects.all()
+    serializer_class = serializers.AuthorSerializer
+
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    # filterset_fields = get_fields(models.Author, exclude=DEFAULT_EXCLUDE)
+    filter_class = AuthorFilter
+    search_fields = ['name', 'surname', 'formatted_name']
+    ordering = ["formatted_name"]
+
+
+class ClusterViewSet(DynamicDepthViewSet): 
+    queryset = models.Cluster.objects.all()
+    serializer_class = serializers.ClusterSerializer
+
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filter_class = ClusterFilter
+    ordering = ['-size']
+
+class SegmentViewSet(DynamicDepthViewSet): 
+    queryset = models.Segment.objects.all()
+    serializer_class = serializers.SegmentSerializer
+
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_class = SegmentFilter
+    search_fields = ['text']
