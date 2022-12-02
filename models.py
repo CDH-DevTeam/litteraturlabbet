@@ -91,7 +91,7 @@ class Segment(abstract.AbstractBaseModel):
     end = models.PositiveIntegerField(verbose_name=_("end"))
 
     cluster = models.ForeignKey(Cluster, verbose_name=_("cluster"), on_delete=models.CASCADE, related_name='segments')
-    page = models.ForeignKey(Page, verbose_name=_("page"), on_delete=models.CASCADE)
+    page = models.ForeignKey(Page, verbose_name=_("page"), on_delete=models.CASCADE, related_name='segments')
     text = models.TextField(default="", verbose_name=_("excerpt"))
 
     series =models.CharField(max_length=64, verbose_name=_("series"))

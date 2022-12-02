@@ -15,6 +15,7 @@ router.register(rf'{endpoint}/work', views.WorkPageViewSet, basename='work')
 router.register(rf'{endpoint}/author', views.AuthorViewSet, basename='author')
 router.register(rf'{endpoint}/cluster', views.ClusterViewSet, basename='cluster')
 router.register(rf'{endpoint}/segment', views.SegmentViewSet, basename='segment')
+# router.register(rf'{endpoint}/author_exchange', views.AuthorExchangeView, basename='author-exchange')
 
 
 
@@ -22,7 +23,7 @@ urlpatterns = [
     path('', include(router.urls)),
 
     *documentation,
-
+    path(rf'{endpoint}/author_exchange/', views.AuthorExchangeView.as_view())
     # Automatically generated views
     # *utils.get_model_urls('litteraturlabbet', f'{endpoint}', exclude=['page', 'work', 'work_authors', 'author', 'cluster', ),
 ]

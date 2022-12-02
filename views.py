@@ -7,7 +7,9 @@ from rest_framework.compat import coreapi, coreschema
 from django.utils.encoding import force_str
 from diana.abstract.views import DynamicDepthViewSet
 from diana.abstract.models import get_fields, DEFAULT_EXCLUDE
-
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import Count, Q
+from rest_framework import viewsets, generics,response
 class FragmentFilter(BaseFilterBackend):
 
     search_param = 'search'
@@ -186,3 +188,45 @@ class SegmentViewSet(DynamicDepthViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filter_class = SegmentFilter
     search_fields = ['text']
+
+class AuthorExchangeView(generics.ListAPIView):
+
+    # serializer_class = serializers.AuthorExchangeSerializer
+    queryset = models.Cluster.objects\
+        .annotate(
+            authors=ArrayAgg('segments__page__work__main_author', filter=Q(segments__page__work__main_author__isnull=False), distinct=True), 
+            count=Count('segments__page__work__main_author', distinct=True))\
+        .filter(count__gt=1)\
+        .order_by('count')\
+        .values()\
+        .all()
+
+    def list(self, request):
+        # Note the use of `get_queryset()` instead of `self.queryset`
+        queryset = self.get_queryset()
+
+        # Flatten the list and make all names unique
+        d = {}
+        for c in queryset:
+            l = c['authors']
+
+            for i in l:
+                if i not in d.keys():
+                    d[i] = {}
+                for j in l:
+                    if i != j:
+                        if j not in d[i].keys():
+                            d[i][j] = 0
+                        else:
+                            d[i][j] += 1
+
+        edges = []
+        for source, value in d.items():
+            for target, weight in value.items():
+                if weight > 0:
+                    edges.append({"source": source, "target": target, "weight": weight})
+
+
+        serializer = serializers.TargetSourceSerializer(edges, many=True)
+        return response.Response(serializer.data)
+
