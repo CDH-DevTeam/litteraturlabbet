@@ -19,7 +19,10 @@ The original data was delivered as directories corresponding to a work, or book,
 ```
 Methods to parse this structure is found in the `data/litteraturbanken.py` file.
 
-Methods to upload this data to Diana is found in the `data/upload.py` file.
+### Upload to Diana
+To upload the works to Diana, use the methods in the `data/upload.py` file. 
+
+If creating the database from scratch, to optimize the full-text search in the works, consider using the custom Django migration in the `custom_migrations` folder, which when applied. It should already be functional when re-uploading material.
 
 ### Metadata
 To extract the metadata, use the Litteraturbanken API: `https://litteraturbanken.se/api/get_work_info?lbworkid=<lbworkid>`, where `lbworkid` is a (non-unique) identifier of a certain work in their collections. See `data/upload.py` for an example.
