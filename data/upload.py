@@ -1,4 +1,4 @@
-from . import models
+from .. import models
 import requests
 from . import litteraturbanken
 from tqdm import tqdm
