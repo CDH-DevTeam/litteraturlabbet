@@ -1,3 +1,5 @@
+import os
+from gensim.models import KeyedVectors
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, BaseFilterBackend, OrderingFilter
 from django_filters import rest_framework as filters
@@ -9,8 +11,12 @@ from diana.abstract.views import DynamicDepthViewSet
 from diana.abstract.models import get_fields, DEFAULT_EXCLUDE
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Count, Q
-from rest_framework import viewsets, generics, response
+from rest_framework import viewsets, generics,response
 from itertools import combinations
+
+vectors_path_s = "/home/aram/CDH/LB_word_vectors/remove_stop_words/2"
+vectors_path = "/home/aram/CDH/LB_word_vectors/vectors_3_count"
+embedding_path = "/home/aram/CDH/LB_word_vectors/Author_works_embedding/vector_1_count"
 
 
 class FragmentFilter(BaseFilterBackend):
@@ -267,3 +273,59 @@ class AuthorExchangeView(generics.ListAPIView):
         serializer = serializers.TargetSourceSerializer(edges, many=True)
 
         return response.Response(serializer.data)
+
+
+class SearchWordskViewSet(generics.ListAPIView):
+
+    def list(self, request):
+        author_id = (request.query_params.get("author", None))
+        work_id = (request.query_params.get("work", None))
+        word = request.query_params.get("word", None)
+        
+        # Search for work_id word embeddign file
+        # find similar word into 
+
+        file_name = author_id+'_'+work_id+'.kv'
+        word_similariteis = []
+        for root, dirs, files in os.walk(vectors_path_s):
+            if file_name in files:
+                file_path = (os.path.join(root, file_name))
+                reloaded_word_vectors = KeyedVectors.load(file_path)
+                # for i in reloaded_word_vectors.key_to_index:
+                #     print(i)
+                if word in reloaded_word_vectors.key_to_index:
+                    word_similariteis = reloaded_word_vectors.similar_by_word(word)
+        result = {
+            "got_author_id": author_id,
+            "got_work_id": work_id,
+            "got_word": word,
+            "word_most_similaritries": word_similariteis
+        }
+        return response.Response(result)
+
+
+class ExploreWordskViewSet(generics.ListAPIView):
+
+    def list(self, request):
+        author_id = (request.query_params.get("author", None))
+        word = request.query_params.get("word", None)
+        
+        # Search for work_id word embeddign file
+        # find similar word into 
+
+        file_name = author_id+'.kv'
+        word_similariteis = []
+        for root, dirs, files in os.walk(embedding_path):
+            if file_name in files:
+                file_path = (os.path.join(root, file_name))
+                reloaded_word_vectors = KeyedVectors.load(file_path)
+                # for i in reloaded_word_vectors.key_to_index:
+                #     print(i)
+                if word in reloaded_word_vectors.key_to_index:
+                    word_similariteis = reloaded_word_vectors.similar_by_word(word)
+        result = {
+            "got_author_id": author_id,
+            "got_word": word,
+            "word_most_similaritries": word_similariteis
+        }
+        return response.Response(result)

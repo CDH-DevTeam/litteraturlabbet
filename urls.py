@@ -23,7 +23,9 @@ urlpatterns = [
     path('', include(router.urls)),
 
     *documentation,
-    path(rf'{endpoint}/author_exchange/', views.AuthorExchangeView.as_view())
+    path(rf'{endpoint}/author_exchange/', views.AuthorExchangeView.as_view()),
+    path(rf'{endpoint}/explore', views.SearchWordskViewSet.as_view()),
+    path(rf'{endpoint}/embedding', views.ExploreWordskViewSet.as_view())
     # Automatically generated views
     # *utils.get_model_urls('litteraturlabbet', f'{endpoint}', exclude=['page', 'work', 'work_authors', 'author', 'cluster', ),
 ]
