@@ -39,7 +39,6 @@ def load_works(root):
             try:
                 metadata = get_work_metadata(row["series"])[0]
                 author_metadata = metadata.get('main_author')
-                print(author_metadata)
 
             except:
                 metadata = {}
@@ -71,7 +70,6 @@ def load_works(root):
                 birth_year=birth_year,
                 death_year=death_year,
             )
-            
             work_metadata = metadata
 
 
@@ -81,7 +79,7 @@ def load_works(root):
                 modernized_title=work_metadata.get('title_modernized'),
                 lbworkid=row["series"],
                 librisid=work_metadata.get('librisid'),
-                authors=author,
+                main_author=author,
                 edition=work_metadata.get('edition'),
                 language=work_metadata.get('language'),
                 word_count=work_metadata.get('word_count'),
