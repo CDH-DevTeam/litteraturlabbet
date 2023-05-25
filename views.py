@@ -11,7 +11,9 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Count, Q
 from rest_framework import viewsets, generics, response
 from itertools import combinations
+from .data.upload import *
 
+load_works('/home/aram/CDH/LB/out/out.json')
 
 class FragmentFilter(BaseFilterBackend):
 

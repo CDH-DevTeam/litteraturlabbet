@@ -1,3 +1,5 @@
+import json
+import glob
 from .. import models
 import requests
 from . import litteraturbanken
@@ -20,8 +22,8 @@ def get_work_metadata(lbworkid):
 
 def load_works(root):
 
-    library = litteraturbanken.Library.from_directory(root)
-
+    # library = litteraturbanken.Library.from_directory(root)
+    library = glob.glob(root+"/*.json")
     gender_map = {
         'male': 'M',
         'female': 'F',
@@ -31,61 +33,64 @@ def load_works(root):
     works = []
     progress = tqdm(library)
     for book in progress:
+        book = open(book).readlines()
+        for line in book:
+            row = json.loads(line)
+            try:
+                metadata = get_work_metadata(row["series"])[0]
+                author_metadata = metadata.get('main_author')
+                print(author_metadata)
+
+            except:
+                metadata = {}
+                author_metadata = {}
+            
+            progress.set_description(row["series"])
+
+            try:
+                gender = gender_map[author_metadata.get('gender')]
+            except:
+                gender = 'X'
+
+            try: 
+                birth_year =  int(author_metadata.get('birth').get('date'))
+            except:
+                birth_year = None
+
+            try:
+                death_year = int(author_metadata.get('death').get('date'))
+            except:
+                death_year = None
+
+            author, _   = models.Author.objects.update_or_create(
+                lbauthorid=author_metadata.get('authorid'),
+                normalized_lbauthorid=author_metadata.get('authorid_norm'),
+                name=author_metadata.get('full_name'),
+                gender=gender,
+                formatted_name=author_metadata.get('name_for_index'),
+                birth_year=birth_year,
+                death_year=death_year,
+            )
+            
+            work_metadata = metadata
+
+
+            work = models.Work(
+                title=work_metadata.get('title'),
+                short_title=work_metadata.get('shorttitle'),
+                modernized_title=work_metadata.get('title_modernized'),
+                lbworkid=row["series"],
+                librisid=work_metadata.get('librisid'),
+                authors=author,
+                edition=work_metadata.get('edition'),
+                language=work_metadata.get('language'),
+                word_count=work_metadata.get('word_count'),
+
+            )
+
+            works.append(work)
         
-        try:
-            metadata = get_work_metadata(book.id)[0]
-            author_metadata = metadata.get('main_author')
-
-        except:
-            metadata = {}
-            author_metadata = {}
-        
-        progress.set_description(book.id)
-
-        try:
-            gender = gender_map[author_metadata.get('gender')]
-        except:
-            gender = 'X'
-
-        try: 
-            birth_year =  int(author_metadata.get('birth').get('date'))
-        except:
-            birth_year = None
-
-        try:
-            death_year = int(author_metadata.get('death').get('date'))
-        except:
-            death_year = None
-
-        author, _   = models.Author.objects.update_or_create(
-            lbauthorid=author_metadata.get('authorid'),
-            normalized_lbauthorid=author_metadata.get('authorid_norm'),
-            name=author_metadata.get('full_name'),
-            gender=gender,
-            formatted_name=author_metadata.get('name_for_index'),
-            birth_year=birth_year,
-            death_year=death_year,
-        )
-        
-        work_metadata = metadata
-
-
-        work = models.Work(
-            title=work_metadata.get('title'),
-            short_title=work_metadata.get('shorttitle'),
-            modernized_title=work_metadata.get('title_modernized'),
-            lbworkid=book.id,
-            librisid=work_metadata.get('librisid'),
-            author=author,
-            edition=work_metadata.get('edition'),
-            language=work_metadata.get('language'),
-            word_count=work_metadata.get('word_count'),
-
-        )
-
-        works.append(work)
-    
-    models.Work.objects.bulk_create(works)
+        models.Work.objects.bulk_create(works)
 
 def load_pages(root):
 
