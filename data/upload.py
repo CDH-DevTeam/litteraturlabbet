@@ -33,6 +33,7 @@ def load_works(root):
     works = []
     progress = tqdm(library)
     for book in progress:
+        print(book)
         book = open(book).readlines()
         for line in book:
             row = json.loads(line)
@@ -83,6 +84,8 @@ def load_works(root):
                 edition=work_metadata.get('edition'),
                 language=work_metadata.get('language'),
                 word_count=work_metadata.get('word_count'),
+                # How add data to many to many field?
+                # authors=author_metadata,
 
             )
 

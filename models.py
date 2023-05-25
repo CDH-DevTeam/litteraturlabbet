@@ -35,7 +35,9 @@ class Work(abstract.AbstractBaseModel):
     short_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_("short title"))
     modernized_title = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_("modernized title"))
 
-    lbworkid = models.CharField(unique=True, max_length=128, verbose_name=_("llbworkid"))
+    # lbworkid = models.CharField(unique=True, max_length=128, verbose_name=_("llbworkid"))
+    lbworkid = models.CharField(max_length=128, verbose_name=_("llbworkid"))
+
     librisid = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("librisid")) 
 
     main_author   = models.ForeignKey(Author, blank=True, null=True, verbose_name=_("author"), on_delete=models.CASCADE)
