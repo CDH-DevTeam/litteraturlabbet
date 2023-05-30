@@ -5,6 +5,11 @@ import requests
 from . import litteraturbanken
 from tqdm import tqdm
 
+gender_map = {
+    'male': 'M',
+    'female': 'F',
+    'not known': 'X'
+}
 
 def get_work_metadata(lbworkid):
 
@@ -19,16 +24,44 @@ def get_work_metadata(lbworkid):
 
     return response['data']
 
+def authors_meta(data):
+    for author in data:
+        try:
+            gender = gender_map[author.get('gender')]
+        except:
+            gender = 'X'
+        try: 
+            birth_year =  int(author.get('birth').get('date'))
+        except:
+            birth_year = None
+
+        try:
+            death_year = int(author.get('death').get('date'))
+        except:
+                death_year = None  
+
+
+        author,_ = models.Author.objects.update_or_create(
+
+            lbauthorid=author.get('authorid'),
+            normalized_lbauthorid=author.get('authorid_norm'),
+            name=author.get('full_name'),
+            gender=gender,
+            formatted_name=author.get('name_for_index'),
+            birth_year=birth_year,
+            death_year=death_year,
+        
+            ) 
+        print(author)
+    return 
+
+
+
 
 def load_works(root):
 
     # library = litteraturbanken.Library.from_directory(root)
     library = glob.glob(root+"/*.json")
-    gender_map = {
-        'male': 'M',
-        'female': 'F',
-        'not known': 'X'
-    }
 
     works = []
     progress = tqdm(library)
@@ -40,10 +73,12 @@ def load_works(root):
             try:
                 metadata = get_work_metadata(row["series"])[0]
                 author_metadata = metadata.get('main_author')
+                authors_metadata =  metadata.get('authors')
 
             except:
                 metadata = {}
                 author_metadata = {}
+                
             
             progress.set_description(row["series"])
 
@@ -71,8 +106,10 @@ def load_works(root):
                 birth_year=birth_year,
                 death_year=death_year,
             )
-            work_metadata = metadata
+            
+            authors_meta(authors_metadata)
 
+            work_metadata = metadata
 
             work = models.Work(
                 title=work_metadata.get('title'),
@@ -84,14 +121,12 @@ def load_works(root):
                 edition=work_metadata.get('edition'),
                 language=work_metadata.get('language'),
                 word_count=work_metadata.get('word_count'),
-                # How add data to many to many field?
-                # authors=author_metadata,
 
             )
-
+            work.authors.set(authors_meta(authors_metadata))
             works.append(work)
         
-        models.Work.objects.bulk_create(works)
+        models.Work.objects.bulk_create(works, ignore_conflicts=False, update_conflicts=True, update_fields=True, unique_fields=False)
 
 def load_pages(root):
 
