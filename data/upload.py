@@ -25,6 +25,7 @@ def get_work_metadata(lbworkid):
     return response['data']
 
 def authors_meta(data):
+    result = []
     for author in data:
         try:
             gender = gender_map[author.get('gender')]
@@ -34,14 +35,12 @@ def authors_meta(data):
             birth_year =  int(author.get('birth').get('date'))
         except:
             birth_year = None
-
         try:
             death_year = int(author.get('death').get('date'))
         except:
                 death_year = None  
 
-
-        author,_ = models.Author.objects.update_or_create(
+        author,_ = models.Author.objects.get_or_create(
 
             lbauthorid=author.get('authorid'),
             normalized_lbauthorid=author.get('authorid_norm'),
@@ -50,12 +49,9 @@ def authors_meta(data):
             formatted_name=author.get('name_for_index'),
             birth_year=birth_year,
             death_year=death_year,
-        
-            ) 
-        print(author)
-    return 
-
-
+            )
+        result.append(author)
+    return result 
 
 
 def load_works(root):
@@ -79,7 +75,6 @@ def load_works(root):
                 metadata = {}
                 author_metadata = {}
                 
-            
             progress.set_description(row["series"])
 
             try:
@@ -97,7 +92,7 @@ def load_works(root):
             except:
                 death_year = None
 
-            author, _   = models.Author.objects.update_or_create(
+            author, _   = models.Author.objects.get_or_create(
                 lbauthorid=author_metadata.get('authorid'),
                 normalized_lbauthorid=author_metadata.get('authorid_norm'),
                 name=author_metadata.get('full_name'),
@@ -107,26 +102,27 @@ def load_works(root):
                 death_year=death_year,
             )
             
-            authors_meta(authors_metadata)
-
+            authors = authors_meta(authors_metadata)
             work_metadata = metadata
 
-            work = models.Work(
-                title=work_metadata.get('title'),
-                short_title=work_metadata.get('shorttitle'),
-                modernized_title=work_metadata.get('title_modernized'),
+            work,_ = models.Work.objects.get_or_create(
                 lbworkid=row["series"],
-                librisid=work_metadata.get('librisid'),
-                main_author=author,
-                edition=work_metadata.get('edition'),
-                language=work_metadata.get('language'),
-                word_count=work_metadata.get('word_count'),
-
+                defaults={
+                    'title': work_metadata.get('title'),
+                    'short_title': work_metadata.get('shorttitle'),
+                    'modernized_title': work_metadata.get('title_modernized'),
+                    'librisid': work_metadata.get('librisid'),
+                    'main_author': author,
+                    'edition': work_metadata.get('edition'),
+                    'language': work_metadata.get('language'),
+                    'word_count': work_metadata.get('word_count')
+                }
             )
-            work.authors.set(authors_meta(authors_metadata))
-            works.append(work)
+            work.authors.set(authors)
+            work.save()
+            # works.append(work)
         
-        models.Work.objects.bulk_create(works, ignore_conflicts=False, update_conflicts=True, update_fields=True, unique_fields=False)
+        # models.Work.objects.bulk_create(works, ignore_conflicts=False, update_conflicts=True, update_fields=True, unique_fields=False)
 
 def load_pages(root):
 
@@ -135,8 +131,6 @@ def load_pages(root):
     progress = tqdm(library)
     for book in progress:
         
-        
-
         work = models.Work.objects.get(lbworkid=book.id)
 
         pages = []
