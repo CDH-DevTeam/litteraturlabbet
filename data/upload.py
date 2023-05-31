@@ -126,24 +126,27 @@ def load_works(root):
 
 def load_pages(root):
 
-    library = litteraturbanken.Library.from_directory(root)
-
+    # library = litteraturbanken.Library.from_directory(root)
+    library = glob.glob(root+"/*.json")
     progress = tqdm(library)
     for book in progress:
-        
-        work = models.Work.objects.get(lbworkid=book.id)
+        book = open(book).readlines()
+        for line in book:
+            row = json.loads(line)
+            id = row["series"]
+            work = models.Work.objects.get(lbworkid=id)
 
-        pages = []
+            pages = []
 
-        for page in book.pages:
-            page_number = page.id.split('_')[1].replace('.html','')
-            progress.set_description(f"{book.id}, {page_number}")
-            pages.append(models.Page(
-                work=work, 
-                number=int(page_number),
-                text=page.as_text()
-            ))
+            for page in book.pages:
+                page_number = page.id.split('_')[1].replace('.html','')
+                progress.set_description(f"{id}, {page_number}")
+                pages.append(models.Page(
+                    work=work, 
+                    number=int(page_number),
+                    text=page.as_text()
+                ))
 
-        models.Page.objects.bulk_create(pages)
+            models.Page.objects.bulk_create(pages)
 
     
