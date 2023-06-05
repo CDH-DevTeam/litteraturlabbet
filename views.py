@@ -13,7 +13,8 @@ from rest_framework import viewsets, generics, response
 from itertools import combinations
 from .data.upload import *
 
-load_works('/home/aram/CDH/LB/out/out.json')
+load_pages_text('/home/aram/CDH/LB/lb_1800_json.in')
+load_pages('/home/aram/CDH/LB/out/out.json/')
 
 class FragmentFilter(BaseFilterBackend):
 

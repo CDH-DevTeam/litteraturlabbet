@@ -5,6 +5,8 @@ import requests
 from . import litteraturbanken
 from tqdm import tqdm
 
+pages_text = {}
+
 gender_map = {
     'male': 'M',
     'female': 'F',
@@ -23,6 +25,63 @@ def get_work_metadata(lbworkid):
     response = requests.get(url(lbworkid), headers=headers).json()
 
     return response['data']
+
+
+def fetch_work_info(work_metadata, author):
+    metadata = {}
+    
+    try :
+        title =  work_metadata.get('title')
+    except:
+        title = None
+    try :
+        short_title =  work_metadata.get('shorttitle')
+    except:
+        short_title = None
+    try :
+        modernized_title =  work_metadata.get('title_modernized')
+    except:
+        modernized_title = None
+    try :
+        librisid =  work_metadata.get('librisid')
+    except:
+        librisid = None
+    try :
+        edition =  work_metadata.get('edition')
+    except:
+        edition = None   
+    try :
+        language =  work_metadata.get('language')
+    except:
+        language = None
+    try :
+        word_count =  work_metadata.get('word_count')
+    except:
+        word_count = None
+    try :
+        sort_year = work_metadata.get('sort_date').get('date')
+    except:
+        sort_year = None
+    try :
+        imprint_year =  work_metadata.get('sort_date_imprint').get('date')
+    except:
+        imprint_year = None
+
+    metadata={
+        'title': title,
+        'short_title': short_title,
+        'modernized_title': modernized_title,
+        'librisid': librisid,
+        'main_author': author,
+        'edition': edition,
+        'language': language,
+        'word_count': word_count,
+        'sort_year' : sort_year,
+        'imprint_year' : imprint_year,
+
+    }
+    return metadata
+
 
 def authors_meta(data):
     result = []
@@ -72,7 +131,6 @@ def load_works(root):
                 authors_metadata =  metadata.get('authors')
 
             except:
-                metadata = {}
                 author_metadata = {}
                 
             progress.set_description(row["series"])
@@ -100,27 +158,67 @@ def load_works(root):
                 formatted_name=author_metadata.get('name_for_index'),
                 birth_year=birth_year,
                 death_year=death_year,
-            )
+                )
             
             authors = authors_meta(authors_metadata)
             work_metadata = metadata
+            try :
+                title =  work_metadata.get('title')
+            except:
+                title = None
+            try :
+                short_title =  work_metadata.get('shorttitle')
+            except:
+                short_title = None
+            try :
+                modernized_title =  work_metadata.get('title_modernized')
+            except:
+                modernized_title = None
+            try :
+                librisid =  work_metadata.get('librisid')
+            except:
+                librisid = None
+            try :
+                edition =  work_metadata.get('edition')
+            except:
+                edition = None   
+            try :
+                language =  work_metadata.get('language')
+            except:
+                language = None
+            try :
+                word_count =  work_metadata.get('word_count')
+            except:
+                word_count = None
+            try :
+                sort_year = work_metadata.get('sort_date').get('date')
+            except:
+                sort_year = None
+            try :
+                imprint_year =  work_metadata.get('sort_date_imprint').get('date')
+            except:
+                imprint_year = None
 
-            work,_ = models.Work.objects.get_or_create(
-                lbworkid=row["series"],
-                defaults={
-                    'title': work_metadata.get('title'),
-                    'short_title': work_metadata.get('shorttitle'),
-                    'modernized_title': work_metadata.get('title_modernized'),
-                    'librisid': work_metadata.get('librisid'),
-                    'main_author': author,
-                    'edition': work_metadata.get('edition'),
-                    'language': work_metadata.get('language'),
-                    'word_count': work_metadata.get('word_count')
-                }
-            )
-            work.authors.set(authors)
-            work.save()
-            # works.append(work)
+
+            lbworkid=row["series"]
+            if (lbworkid):
+                work,_ = models.Work.objects.get_or_create(
+                                                            lbworkid=row["series"], 
+                                                            defaults= {
+                                                                   'title': title,
+                                                                    'short_title': short_title,
+                                                                    'modernized_title': modernized_title,
+                                                                    'librisid': librisid,
+                                                                    'main_author': author,
+                                                                    'edition': edition,
+                                                                    'language': language,
+                                                                    'word_count': word_count,
+                                                                    'sort_year' : sort_year,
+                                                                    'imprint_year' : imprint_year,
+                                                                    }
+                                                            )
+                work.authors.set(authors)
+                work.save()
         
         # models.Work.objects.bulk_create(works, ignore_conflicts=False, update_conflicts=True, update_fields=True, unique_fields=False)
 
@@ -131,22 +229,74 @@ def load_pages(root):
     progress = tqdm(library)
     for book in progress:
         book = open(book).readlines()
+        progress = tqdm(book)
+    
         for line in book:
-            row = json.loads(line)
-            id = row["series"]
-            work = models.Work.objects.get(lbworkid=id)
-
-            pages = []
-
-            for page in book.pages:
-                page_number = page.id.split('_')[1].replace('.html','')
-                progress.set_description(f"{id}, {page_number}")
-                pages.append(models.Page(
-                    work=work, 
-                    number=int(page_number),
-                    text=page.as_text()
-                ))
-
-            models.Page.objects.bulk_create(pages)
+            row = json.loads(line) 
+            workid = row["series"]
+            if workid == pages_text['series'] and row['page'] == pages_text['number']:
+                text = pages_text['text']
+            else:
+                text = ''
+            progress.set_description(f"{workid}, {row['page']}")
+            page,_ = models.Page.objects.get_or_create(           
+                                number = row['page'],
+                                work = models.Work.objects.get(lbworkid=workid),
+                                defaults= {
+                                    'text': text,
+                                }
+                            )
+            page.save()
 
     
+
+def load_pages_text(main_text_input):
+    pages = open(main_text_input, encoding='latin-1')
+    for page in pages:
+        try :
+            page = json.loads(page, strict=False) 
+            pages_text['series'] = page['series']
+            if 'page' in page:
+                pages_text['number'] = page['page']
+                pages_text['text'] = page['text']
+        except:
+            print(page)
+
+
+def load_cluster(root):
+    library = glob.glob(root+"/*.json")
+    progress = tqdm(library)
+    for book in progress:
+        print(book)
+        book = open(book).readlines()
+        for line in book:
+            row = json.loads(line) 
+            workid = row["series"]
+            progress.set_description(f"{workid}, {row['cluster']}")
+            
+
+def load_segment(root):
+    library = glob.glob(root+"/*.json")
+    progress = tqdm(library)
+    for book in progress:
+        print(book)
+        book = open(book).readlines()
+        for line in book:
+            row = json.loads(line) 
+            workid = row["series"]
+            progress.set_description(f"{workid}, {row['cluster']}")
+            segment,_ = models.Segment.objects.get_or_create(   
+                                uuid = row['uuid'],
+                                gid = row['gid'],      
+                                bw = row['bw'],
+                                ew = row['ew'],
+                                begin = row['begin'],
+                                end = row['end'],
+                                # ????
+                                cluster = models.Cluster.objects.get(lbworkid=workid),
+                                # ????
+                                page = models.Page.objects.get(lbworkid=workid),
+                                text = row['text'],
+                                series = workid
+                            )
+            segment.save()
