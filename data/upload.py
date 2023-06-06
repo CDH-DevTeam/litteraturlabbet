@@ -234,8 +234,10 @@ def load_pages(root):
         for line in book:
             row = json.loads(line) 
             workid = row["series"]
-            if workid == pages_text['series'] and row['page'] == pages_text['number']:
-                text = pages_text['text']
+            if workid in pages_text:
+                text = pages_text[workid].get(row['page'], "")
+            # if workid == pages_text['series'] and row['page'] == pages_text['number']:
+            #     text = pages_text['text']
             else:
                 text = ''
             progress.set_description(f"{workid}, {row['page']}")
@@ -254,13 +256,14 @@ def load_pages_text(main_text_input):
     pages = open(main_text_input, encoding='latin-1')
     for page in pages:
         try :
-            page = json.loads(page, strict=False) 
-            pages_text['series'] = page['series']
-            if 'page' in page:
-                pages_text['number'] = page['page']
-                pages_text['text'] = page['text']
+            page = json.loads(page, strict=False)
+            book_id = page['series']
+            if book_id not in pages_text:
+                pages_text[book_id] = {}
+            pages_text[book_id][page['page']] = page['text']
         except:
             print(page)
+    i = 5
 
 
 def load_cluster(root):
