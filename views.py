@@ -169,7 +169,9 @@ class PageViewSet(DynamicDepthViewSet):
 
 
 class AuthorViewSet(DynamicDepthViewSet):
-    queryset = models.Author.objects.all()
+    work = models.Work.objects.all()
+    # queryset = models.Author.objects.all()
+    queryset = models.Author.objects.all().filter(id__in=list(work.values_list('main_author', flat=True)))
     serializer_class = serializers.AuthorSerializer
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
