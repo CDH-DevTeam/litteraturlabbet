@@ -158,6 +158,18 @@ class WorkPageViewSet(DynamicDepthViewSet):
                      'modernized_title', 'authors__name']
 
 
+class Work19thCenturyViewSet(DynamicDepthViewSet):
+
+    queryset = models.Work.objects.all().filter(Q(imprint_year__lte=1800)and Q(imprint_year__gte=100))
+    serializer_class = serializers.WorkPageSerializer
+
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    # filterset_fields = get_fields(models.Work, exclude=DEFAULT_EXCLUDE + ['page__text_vector'])
+    filter_class = WorkFilter
+    search_fields = ['title', 'short_title',
+                     'modernized_title', 'authors__name']
+
+
 class PageViewSet(DynamicDepthViewSet):
     queryset = models.Page.objects.all()
     serializer_class = serializers.PageSerializer

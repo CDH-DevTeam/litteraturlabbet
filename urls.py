@@ -11,6 +11,7 @@ documentation = utils.build_app_api_documentation("litteraturlabbet", endpoint)
 
 router = routers.DefaultRouter()
 router.register(rf'{endpoint}/page', views.PageViewSet, basename='page')
+router.register(rf'{endpoint}/work/19th_century', views.Work19thCenturyViewSet, basename='19th century work')
 router.register(rf'{endpoint}/work', views.WorkPageViewSet, basename='work')
 router.register(rf'{endpoint}/author', views.AuthorViewSet, basename='author')
 router.register(rf'{endpoint}/cluster', views.ClusterViewSet, basename='cluster')
