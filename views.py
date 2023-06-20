@@ -160,7 +160,7 @@ class WorkPageViewSet(DynamicDepthViewSet):
 
 class Work19thCenturyViewSet(DynamicDepthViewSet):
 
-    queryset = models.Work.objects.all().filter(Q(imprint_year__lte=1800)and Q(imprint_year__gte=100))
+    queryset = models.Work.objects.all().filter(Q(imprint_year__lte=1900)and Q(imprint_year__gte=1800))
     serializer_class = serializers.WorkPageSerializer
 
     filter_backends = [DjangoFilterBackend, SearchFilter]
