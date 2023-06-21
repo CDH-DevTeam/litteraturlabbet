@@ -281,3 +281,12 @@ class AuthorExchangeView(generics.ListAPIView):
         serializer = serializers.TargetSourceSerializer(edges, many=True)
 
         return response.Response(serializer.data)
+
+
+
+class AuthorExchangeSegmentsView(DynamicDepthViewSet):
+    serializer_class = serializers.ClusterSerializer
+    queryset = models.Cluster.objects.annotate(
+        count=Count('segments__page__work__main_author', distinct=True),
+        authors=ArrayAgg('segments__page__work__main_author', distinct=True),
+        ).filter(count__gt=1)
