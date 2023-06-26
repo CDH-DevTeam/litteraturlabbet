@@ -49,6 +49,7 @@ class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
         fields = get_fields(models.Cluster, exclude=DEFAULT_EXCLUDE) + ['segments']
         # depth = 1
 
+
 class AuthorExchangeSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
     authors = serializers.ListField(child=serializers.IntegerField())
@@ -57,9 +58,21 @@ class AuthorExchangeSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
         model = models.Cluster
         fields = get_fields(models.Cluster, exclude=DEFAULT_EXCLUDE) + ['authors', 'count']
 
-
 class TargetSourceSerializer(serializers.Serializer):
 
     source = serializers.IntegerField()
     target = serializers.IntegerField()
     weight = serializers.IntegerField()
+
+
+class ClusterInfoSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
+
+    authors = AuthorSerializer
+    works = WorkPageSerializer
+    segments = SegmentSerializer
+
+
+    class Meta:
+        model = models.Cluster
+        fields =  get_fields(models.Cluster, exclude=DEFAULT_EXCLUDE) + ['segments']
+        depth = 4
