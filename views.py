@@ -12,6 +12,7 @@ from django.db.models import Count, Q
 from rest_framework import viewsets, generics, response
 from itertools import combinations
 from .data.upload import *
+from django.db.models import Prefetch
 
 class FragmentFilter(BaseFilterBackend):
 
@@ -295,10 +296,13 @@ class AuthorExchangeView(generics.ListAPIView):
 
  
 class AuthorExchangeSegmentsView(DynamicDepthViewSet):
-    serializer_class = serializers.AuthorExchangeSerializer
-
-    queryset = models.Cluster.objects.annotate(
-            count=Count('segments__page__work__main_author', distinct=True),
-            authors=ArrayAgg('segments__page__work__main_author', distinct=True),
-            ).filter(count__gt=1)
+    serializer_class = serializers.ClusterInfoSerializer
     
+
+    def get_queryset(self):
+        source = self.request.GET["source"]
+        source_segment = self.request.GET["source_segment"]
+
+        queryset = models.Cluster.objects.filter(Q(segments__page__work__main_author=source) & Q(segments__id=source_segment)) 
+
+        return queryset

@@ -72,12 +72,11 @@ class TargetSourceSerializer(serializers.Serializer):
 
 class ClusterInfoSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
-    authors = serializers.ListField(child=serializers.IntegerField())
     works = WorkPageSerializer
     segments = SegmentSerializer
 
 
     class Meta:
         model = models.Cluster
-        fields = ['authors'] + get_fields(models.Cluster, exclude=DEFAULT_EXCLUDE) + ['segments'] 
+        fields = get_fields(models.Cluster, exclude=DEFAULT_EXCLUDE) + ['segments']
         depth = 4
