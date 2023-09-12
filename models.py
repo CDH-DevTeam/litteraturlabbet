@@ -96,7 +96,7 @@ class Segment(abstract.AbstractBaseModel):
     page = models.ForeignKey(Page, verbose_name=_("page"), on_delete=models.CASCADE, related_name='segments')
     text = models.TextField(default="", verbose_name=_("excerpt"))
 
-    series =models.CharField(max_length=64, verbose_name=_("series"))
+    series =models.ForeignKey(Work, on_delete=models.CASCADE, verbose_name=_("series"))
 
     def __str__(self) -> str:
         return f"{self.page.work.title}, {self.bw}-{self.ew}"
