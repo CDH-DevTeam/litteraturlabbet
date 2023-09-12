@@ -1,5 +1,6 @@
 import json
 import glob
+import os
 from .. import models
 import requests
 from . import litteraturbanken
@@ -116,21 +117,23 @@ def authors_meta(data):
 
 def load_works(root):
     work_list = []
-    library = open(root, encoding='latin-1')
-    for page in library:
-        try :
-            page = json.loads(page, strict=False)
-            if page['series'] not in work_list:
+    # page_files = glob(os.path.join(root, '*.json'))
+    # for page in library:
+
+    for library in glob.glob(os.path.join(root, '*.json')):
+        with open(os.path.join(os.getcwd(), library), 'r') as file:
+            page = json.load(file, strict=False)
+            if page['lbworkid'] not in work_list:
                 progress = tqdm(library)
                 try:
-                    metadata = get_work_metadata(page["series"])[0]
+                    metadata = get_work_metadata(page["lbworkid"])[0]
                     author_metadata = metadata.get('main_author')
                     authors_metadata =  metadata.get('authors')
 
                 except:
                     author_metadata = {}
                     
-                progress.set_description(page["series"])
+                progress.set_description(page["lbworkid"])
 
                 try:
                     gender = gender_map[author_metadata.get('gender')]
@@ -195,12 +198,16 @@ def load_works(root):
                     imprint_year =  work_metadata.get('sort_date_imprint').get('date')
                 except:
                     imprint_year = None
+                try:
+                    modernized_title = work_metadata.get('titleid')
+                except:
+                    modernized_title = None
 
 
-                lbworkid=page["series"]
+                lbworkid=page["lbworkid"]
                 if (lbworkid):
                     work,_ = models.Work.objects.update_or_create(
-                                                                lbworkid=page["series"], 
+                                                                lbworkid=page["lbworkid"], 
                                                                 defaults= {
                                                                     'title': title,
                                                                         'short_title': short_title,
@@ -216,35 +223,31 @@ def load_works(root):
                                                                 )
                     work.authors.set(authors)
                     work.save()
-                    work_list.append(page["series"])
-        except:
-            print(page)
-            continue
-        
+                    work_list.append(page["lbworkid"])
+
+            
 
 def load_pages(root):
-    pages = open(root, encoding='latin-1')
-    progress = tqdm(pages)
-    for page in pages:
-        try :
-            page = json.loads(page, strict=False)
-            workid = page['series']
-            progress.set_description(f"{workid}, {page['page']}")
-            if page['text']:
-                text = page['text']
-            else:
-                text = ''
-            page,_ = models.Page.objects.update_or_create(           
-                                number = page['page'],
-                                work = models.Work.objects.get(lbworkid=workid),
-                                defaults= {
-                                    'text': text,
-                                }
-                            )
-            page.save()
-        except:
-            print(page)
-            continue
+    # pages = open(root, encoding='latin-1')
+    for library in glob.glob(os.path.join(root, '*.json')):
+        with open(os.path.join(os.getcwd(), library), 'r') as file:
+            work = json.load(file, strict=False)
+            workid = work['lbworkid']
+            pages = work['pages']
+            for page in pages:
+                if page['text']:
+                    text = page['text']
+                else:
+                    text = ''
+                page,_ = models.Page.objects.update_or_create(           
+                                            number = page['page_n'],
+                                            work = models.Work.objects.get(lbworkid=workid),
+                                            defaults= {
+                                                'text': text,
+                                            }
+                                        )
+                page.save()
+
     
 
 def load_cluster(root):
@@ -257,7 +260,7 @@ def load_cluster(root):
             workid = row["series"]
             progress.set_description(f"{workid}, {row['cluster']}")
             cluster,_ = models.Cluster.objects.get_or_create(           
-                    id = (row['cluster']+25769813563),
+                    id = (row['cluster']),
                     size = row['size'],
                 )
             cluster.save()
@@ -273,7 +276,7 @@ def load_segment(root):
             workid = row["series"]
             work = models.Work.objects.get(lbworkid=workid)
             page = models.Page.objects.get(work=work, number=row['page'])
-            cluster = row['cluster']+25769813563
+            cluster = row['cluster']
             progress.set_description(f"{workid}, {cluster}")
             segment,_ = models.Segment.objects.get_or_create(   
                                 uid = row['uid'],
@@ -285,6 +288,6 @@ def load_segment(root):
                                 cluster = models.Cluster.objects.get(id=cluster),
                                 page = page,
                                 text = row['text'],
-                                series = workid
+                                series = models.Work.objects.get(lbworkid=workid)
                             )
             segment.save()
