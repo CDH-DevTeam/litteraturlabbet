@@ -35,7 +35,7 @@ class SegmentSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
     class Meta:
         model = models.Segment
         fields = "__all__"
-        depth = 0
+        # depth = 0
 
 class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
