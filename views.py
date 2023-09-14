@@ -289,7 +289,7 @@ class AuthorExchangeSegmentsView(DynamicDepthViewSet):
 
     def get_queryset(self):
         source = self.request.GET["author_1"]
-        target = self.request.GET["auhtor_2"]
+        target = self.request.GET["author_2"]
     
         queryset = models.Cluster.objects.annotate(
         count=Count('segments__series__main_author', distinct=True),
