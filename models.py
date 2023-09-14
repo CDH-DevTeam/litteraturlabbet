@@ -82,21 +82,21 @@ class Cluster(abstract.AbstractBaseModel):
     def __str__(self) -> str:
         return f"{self.id}"
 
-# class Segment(abstract.AbstractBaseModel):
+class Segment(abstract.AbstractBaseModel):
     
-#     uid = models.CharField(max_length=256, default="")
-#     gid = models.CharField(max_length=256, default="")
+    uid = models.CharField(max_length=256, default="")
+    gid = models.CharField(max_length=256, default="")
 
-#     bw = models.PositiveIntegerField(verbose_name=_("bw"))
-#     ew = models.PositiveIntegerField(verbose_name=_("ew"))
-#     begin = models.PositiveIntegerField(verbose_name=_("begin"))
-#     end = models.PositiveIntegerField(verbose_name=_("end"))
+    bw = models.PositiveIntegerField(verbose_name=_("bw"))
+    ew = models.PositiveIntegerField(verbose_name=_("ew"))
+    begin = models.PositiveIntegerField(verbose_name=_("begin"))
+    end = models.PositiveIntegerField(verbose_name=_("end"))
 
-#     cluster = models.ForeignKey(Cluster, verbose_name=_("cluster"), on_delete=models.CASCADE, related_name='segments')
-#     page = models.ForeignKey(Page, verbose_name=_("page"), on_delete=models.CASCADE, related_name='segments')
-#     text = models.TextField(default="", verbose_name=_("excerpt"))
+    cluster = models.ForeignKey(Cluster, verbose_name=_("cluster"), on_delete=models.CASCADE, related_name='segments')
+    page = models.ForeignKey(Page, verbose_name=_("page"), on_delete=models.CASCADE, related_name='segments')
+    text = models.TextField(default="", verbose_name=_("excerpt"))
 
-#     series = models.ForeignKey(Work, on_delete=models.CASCADE, verbose_name=_("work id"))
+    series = models.ForeignKey(Work, on_delete=models.CASCADE, verbose_name=_("work id"))
 
-#     def __str__(self) -> str:
-#         return f"{self.page.work.title}, {self.bw}-{self.ew}"
+    def __str__(self) -> str:
+        return f"{self.page.work.title}, {self.bw}-{self.ew}"
