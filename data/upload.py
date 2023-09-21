@@ -41,7 +41,7 @@ def fetch_work_info(work_metadata, author):
     except:
         short_title = None
     try :
-        modernized_title =  work_metadata.get('title_modernized')
+        modernized_title =  work_metadata.get('titleid')
     except:
         modernized_title = None
     try :
@@ -122,18 +122,19 @@ def load_works(root):
 
     for library in glob.glob(os.path.join(root, '*.json')):
         with open(os.path.join(os.getcwd(), library), 'r') as file:
-            page = json.load(file, strict=False)
-            if page['lbworkid'] not in work_list:
+            work = json.load(file, strict=False)
+
+            if work['lbworkid'] not in work_list:
                 progress = tqdm(library)
                 try:
-                    metadata = get_work_metadata(page["lbworkid"])[0]
+                    metadata = get_work_metadata(work["lbworkid"])[0]
                     author_metadata = metadata.get('main_author')
                     authors_metadata =  metadata.get('authors')
 
                 except:
                     author_metadata = {}
                     
-                progress.set_description(page["lbworkid"])
+                progress.set_description(work["lbworkid"])
 
                 try:
                     gender = gender_map[author_metadata.get('gender')]
@@ -163,51 +164,51 @@ def load_works(root):
                 authors = authors_meta(authors_metadata)
                 work_metadata = metadata
                 try :
-                    title =  work_metadata.get('title')
+                    title =  work['title']
                 except:
                     title = None
                 try :
-                    short_title =  work_metadata.get('shorttitle')
+                    short_title =  work['shorttitle']
                 except:
                     short_title = None
                 try :
-                    modernized_title =  work_metadata.get('title_modernized')
+                    modernized_title =  work['title_modernized']
                 except:
                     modernized_title = None
                 try :
-                    librisid =  work_metadata.get('librisid')
+                    librisid =  work['librisid']
                 except:
                     librisid = None
                 try :
-                    edition =  work_metadata.get('edition')
+                    edition =  work['edition']
                 except:
                     edition = None   
                 try :
-                    language =  work_metadata.get('language')
+                    language =  work['language']
                 except:
                     language = None
                 try :
-                    word_count =  work_metadata.get('word_count')
+                    word_count =  work['word_count']
                 except:
                     word_count = None
                 try :
-                    sort_year = work_metadata.get('sort_date').get('date')
+                    sort_year = work['sort_date'].get('date')
                 except:
                     sort_year = None
                 try :
-                    imprint_year =  work_metadata.get('sort_date_imprint').get('date')
+                    imprint_year =  work['sort_date_imprint'].get('date')
                 except:
                     imprint_year = None
                 try:
-                    modernized_title = work_metadata.get('titleid')
+                    modernized_title = work['titleid']
                 except:
                     modernized_title = None
 
 
-                lbworkid=page["lbworkid"]
+                lbworkid=work["lbworkid"]
                 if (lbworkid):
-                    work,_ = models.Work.objects.update_or_create(
-                                                                lbworkid=page["lbworkid"], 
+                    book,_ = models.Work.objects.update_or_create(
+                                                                lbworkid=work["lbworkid"], 
                                                                 defaults= {
                                                                     'title': title,
                                                                         'short_title': short_title,
@@ -221,9 +222,9 @@ def load_works(root):
                                                                         'imprint_year' : imprint_year,
                                                                         }
                                                                 )
-                    work.authors.set(authors)
-                    work.save()
-                    work_list.append(page["lbworkid"])
+                    book.authors.set(authors)
+                    book.save()
+                    work_list.append(lbworkid)
 
             
 
