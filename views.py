@@ -14,6 +14,7 @@ from itertools import combinations
 from .data.upload import *
 from django.db.models import Prefetch
 
+
 class FragmentFilter(BaseFilterBackend):
 
     search_param = 'search'
@@ -292,8 +293,8 @@ class AuthorExchangeSegmentsView(DynamicDepthViewSet):
         target = self.request.GET["author_2"]
     
         queryset = models.Cluster.objects.annotate(
-        count=Count('segments__series__main_author', distinct=True),
-        authors=ArrayAgg('segments__series__main_author', distinct=True),
+        count=Count('segments__series__main_author'),
+        authors=ArrayAgg('segments__series__main_author'),
         ).filter(count__gt=1).filter(
             segments__series__main_author__id=source).filter(
             segments__series__main_author__id=target    
