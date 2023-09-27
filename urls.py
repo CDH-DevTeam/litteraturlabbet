@@ -17,7 +17,7 @@ router.register(rf'{endpoint}/author', views.AuthorViewSet, basename='author')
 router.register(rf'{endpoint}/cluster', views.ClusterViewSet, basename='cluster')
 router.register(rf'{endpoint}/segment', views.SegmentViewSet, basename='segment')
 router.register(rf'{endpoint}/author_exchange_info', views.AuthorExchangeSegmentsView, basename='author-exchange full information')
-
+router.register(rf'{endpoint}/phrase_search', views.PhraseSearchView, basename='phrase search')
 
 urlpatterns = [
     path('', include(router.urls)),

@@ -302,3 +302,41 @@ class AuthorExchangeSegmentsView(DynamicDepthViewSet):
         
         return queryset
     
+# class PhraseSearchViewFast(DynamicDepthViewSet):
+#     serializer_class = serializers.SegmentSerializer
+
+#     def get_queryset(self):
+#         phrase = self.request.GET["phrase"]
+        
+#         vector = SearchVector("text")
+#         query = SearchQuery(phrase, search_type='phrase')
+#         search_headline = SearchHeadline('text', query)
+        
+#         filtered_queryset = models.Segment.objects.annotate(rank=SearchRank(vector, query)).annotate(excerpt=search_headline).order_by('-rank')
+        
+#         unique_cluster_ids = filtered_queryset.values_list('cluster__id', flat=True).distinct()
+
+#         additional_data_queryset = models.Segment.objects.filter(cluster__id__in=unique_cluster_ids)
+
+#         queryset = filtered_queryset | additional_data_queryset
+#         #queryset = filtered_queryset.prefetch_related(
+#         #    Prefetch(
+#         #        'cluster__segments',
+#         #        queryset=additional_data_queryset,
+#         #        to_attr='additional_data'
+#         #    )
+#         #)
+
+#         return queryset
+    
+class PhraseSearchView(DynamicDepthViewSet):
+    serializer_class = serializers.SegmentSerializer
+
+    def get_queryset(self):
+        phrase = self.request.GET["phrase"]
+        filtered_queryset = models.Segment.objects.filter(text__icontains=phrase)
+        unique_cluster_ids = filtered_queryset.values_list('cluster__id', flat=True).distinct()
+        additional_data_queryset = models.Segment.objects.filter(cluster__id__in=unique_cluster_ids)
+        queryset = filtered_queryset | additional_data_queryset
+        return queryset
+    
