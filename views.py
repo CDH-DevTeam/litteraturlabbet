@@ -333,7 +333,7 @@ class PhraseSearchView(DynamicDepthViewSet):
     serializer_class = serializers.SegmentSerializer
 
     def get_queryset(self):
-        phrase = self.request.GET["phrase"]
+        phrase = self.request.GET["phrase"] # comment
         filtered_queryset = models.Segment.objects.filter(text__icontains=phrase)
         unique_cluster_ids = filtered_queryset.values_list('cluster__id', flat=True).distinct()
         additional_data_queryset = models.Segment.objects.filter(cluster__id__in=unique_cluster_ids)
