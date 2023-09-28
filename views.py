@@ -251,8 +251,8 @@ class AuthorExchangeView(generics.ListAPIView):
     #                 edges.append({"source": source, "target": target, "weight": weight})
 
     queryset = models.Cluster.objects.annotate(
-        count=Count('segments__page__work__main_author', distinct=True),
-        authors=ArrayAgg('segments__page__work__main_author', distinct=True),
+        count=Count('segments__page__work__main_author'),
+        authors=ArrayAgg('segments__page__work__main_author'),
         ).filter(count__gt=1)
 
     def list(self, request):
