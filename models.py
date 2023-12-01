@@ -10,6 +10,9 @@ from django.db import models
 import diana.abstract.models as abstract
 import diana.abstract.mixins as mixins
 from django.utils.translation import gettext_lazy as _
+from django.contrib.postgres.fields import ArrayField
+from diana.storages import OriginalFileStorage
+from diana.abstract.models import *
 
 class Author(abstract.AbstractBaseModel, mixins.GenderedMixin):
 
@@ -100,3 +103,22 @@ class Segment(abstract.AbstractBaseModel):
 
     def __str__(self) -> str:
         return f"{self.page.work.title}, {self.bw}-{self.ew}"
+ 
+    
+class Graphics(abstract.AbstractTIFFImageModel):
+    work = models.ForeignKey(Work, verbose_name=_("work"), on_delete=models.CASCADE, related_name='graphics')
+    page = models.ForeignKey(Page, verbose_name=_("page"), on_delete=models.CASCADE, related_name='graphics')
+    label_en = models.CharField( blank=True, null=True, max_length=1024, default="", verbose_name=_("English label"))
+    label_sv = models.CharField( blank=True, null=True, max_length=1024, default="", verbose_name=_("Swedish label"))
+    bbox = ArrayField(
+            models.FloatField(max_length=10, blank=True, null=True),
+            size=4,
+        )
+    score = models.FloatField(max_length=256, blank=True, null=True)
+    input_image = models.ImageField(storage=OriginalFileStorage, upload_to=get_original_path, verbose_name=_("general.file"))
+
+    def __str__(self) -> str:
+        if self.label_sv:
+            return f"{self.work.title}, {self.label_sv}"
+        else:
+            return f"{self.work.title}, {self.label_en}"

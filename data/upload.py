@@ -188,15 +188,15 @@ def load_works(root):
                 except:
                     language = None
                 try :
-                    word_count =  work['word_count']
+                    word_count =  work_metadata.get('word_count')
                 except:
                     word_count = None
                 try :
-                    sort_year = work['sort_date'].get('date')
+                    sort_year = work_metadata.get('sort_date').get('date')
                 except:
                     sort_year = None
                 try :
-                    imprint_year =  work['sort_date_imprint'].get('date')
+                    imprint_year =  work_metadata.get('sort_date_imprint').get('date')
                 except:
                     imprint_year = None
                 try:

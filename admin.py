@@ -1,9 +1,13 @@
 from django.contrib.gis.db import models
+from django.utils.html import format_html
 from django.contrib.gis import admin
 from django.db.models import Count
 from diana.utils import get_fields, DEFAULT_FIELDS, DEFAULT_EXCLUDE
 from admin_auto_filters.filters import AutocompleteFilter
 from .models import *
+from django.conf import settings
+from PIL import Image as ima
+
 
 class AuthorFilter(AutocompleteFilter):
     title = 'Author' # display title
@@ -54,3 +58,20 @@ class SegmentAdmin(admin.ModelAdmin):
     readonly_fields = ['id', *DEFAULT_FIELDS]
     fields = get_fields(Segment, exclude=DEFAULT_EXCLUDE)
     autocomplete_fields = ['page', 'cluster']
+
+
+@admin.register(Graphics)
+class GraphicsModel(admin.ModelAdmin):
+
+    fields              = ['image_preview', *get_fields(Graphics, exclude=['id'])]
+    readonly_fields     = ['iiif_file', 'uuid', 'image_preview', *DEFAULT_FIELDS]
+    list_display        = ['thumbnail_preview', 'work', 'label_sv']
+    search_fields       = ['label_sv', 'label_en', 'work']
+    
+    list_per_page = 10
+
+    def image_preview(self, obj):
+        return format_html(f'<img src="{settings.IIIF_URL}{obj.iiif_file}/full/full/0/default.jpg" height="300" />')
+
+    def thumbnail_preview(self, obj):
+        return format_html(f'<img src="{settings.IIIF_URL}{obj.iiif_file}/full/full/0/default.jpg" height="100" />')
