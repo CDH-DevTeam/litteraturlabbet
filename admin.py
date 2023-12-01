@@ -67,6 +67,7 @@ class GraphicsModel(admin.ModelAdmin):
     readonly_fields     = ['iiif_file', 'uuid', 'image_preview', *DEFAULT_FIELDS]
     list_display        = ['thumbnail_preview', 'work', 'label_sv']
     search_fields       = ['label_sv', 'label_en', 'work']
+    autocomplete_fields = ['work', 'page']
     
     list_per_page = 10
 

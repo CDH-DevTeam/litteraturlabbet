@@ -37,6 +37,12 @@ class SegmentSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
         fields = "__all__"
         # depth = 0
 
+class TIFFImageSerializer(DynamicDepthSerializer):
+
+    class Meta:
+        model = models.Graphics
+        fields = ['id'] + get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE)
+
 class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
     # authors = AuthorSerializer(read_only=True, many=True)

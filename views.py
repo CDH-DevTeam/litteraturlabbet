@@ -212,6 +212,11 @@ class SegmentViewSet(DynamicDepthViewSet):
     filter_class = SegmentFilter
     search_fields = ['text']
 
+class GraphicViewSet(DynamicDepthViewSet):
+    queryset = models.Graphics.objects.all()
+    serializer_class = serializers.TIFFImageSerializer
+    filterset_fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox'])
+
 
 class AuthorExchangeView(generics.ListAPIView):
 
