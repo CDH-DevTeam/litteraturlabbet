@@ -114,6 +114,17 @@ class ClusterFilter(filters.FilterSet):
         distinct=True
     )
 
+    year_start = filters.NumberFilter(
+        field_name='segments__page__work__imprint_year',
+        lookup_expr='gte',
+        distinct=True
+    )
+
+    year_end = filters.NumberFilter(
+        field_name='segments__page__work__imprint_year',
+        lookup_expr='lte',
+        distinct=True
+    )
     class Meta:
         model = models.Cluster
         fields = get_fields(models.Cluster, exclude=DEFAULT_EXCLUDE)
