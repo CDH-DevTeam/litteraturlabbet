@@ -2,11 +2,10 @@ from distutils import dep_util
 from rest_framework import serializers
 from drf_dynamic_fields import DynamicFieldsMixin
 from diana.abstract.serializers import DynamicDepthSerializer
-
 from diana.utils import DEFAULT_EXCLUDE
 from . import models
-
 from diana.abstract.models import get_fields
+
 
 class PageSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
@@ -37,11 +36,12 @@ class SegmentSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
         fields = "__all__"
         # depth = 0
 
-class TIFFImageSerializer(DynamicDepthSerializer):
+class TIFFGraphicSerializer(DynamicDepthSerializer):
 
     class Meta:
         model = models.Graphics
-        fields = ['id'] + get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE)
+        fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE)
+
 
 class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 

@@ -12,7 +12,6 @@ from django.db.models import Count, Q
 from rest_framework import viewsets, generics, response
 from itertools import combinations
 from .data.upload import *
-from django.db.models import Prefetch
 
 
 class FragmentFilter(BaseFilterBackend):
@@ -224,9 +223,9 @@ class SegmentViewSet(DynamicDepthViewSet):
     search_fields = ['text']
 
 class GraphicViewSet(DynamicDepthViewSet):
+    serializer_class = serializers.TIFFGraphicSerializer
     queryset = models.Graphics.objects.all()
-    serializer_class = serializers.TIFFImageSerializer
-    filterset_fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox'])
+    filterset_fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page'])
 
 
 class AuthorExchangeView(generics.ListAPIView):

@@ -106,8 +106,7 @@ class Segment(abstract.AbstractBaseModel):
 
 
 class Graphics(abstract.AbstractTIFFImageModel):
-    work = models.ForeignKey(Work, verbose_name=_("work"), on_delete=models.CASCADE, related_name='work_id')
-    page = models.ForeignKey(Page, verbose_name=_("page"), on_delete=models.CASCADE, related_name='work_page')
+    page = models.ForeignKey(Page, verbose_name=_("page"), blank=True, null=True, on_delete=models.CASCADE, related_name='work_page', db_index=True)
     label_en = models.CharField( blank=True, null=True, max_length=1024, default="", verbose_name=_("English label"))
     label_sv = models.CharField( blank=True, null=True, max_length=1024, default="", verbose_name=_("Swedish label"))
     bbox = ArrayField(
@@ -115,10 +114,10 @@ class Graphics(abstract.AbstractTIFFImageModel):
             size=4,
         )
     score = models.FloatField(max_length=10, blank=True, null=True)
-    input_image = models.ImageField(storage=OriginalFileStorage, upload_to=get_original_path, verbose_name=_("general.file"))
+    input_image = models.ImageField(storage=OriginalFileStorage, upload_to=get_original_path, blank=True, null=True, verbose_name=_("general.file"))
 
     def __str__(self) -> str:
         if self.label_sv:
-            return f"{self.work.title}, {self.label_sv}"
+            return f"{self.page}, {self.label_sv}"
         else:
-            return f"{self.work.title}, {self.label_en}"
+            return f"{self.page}, {self.label_en}"
