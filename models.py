@@ -107,14 +107,14 @@ class Segment(abstract.AbstractBaseModel):
 
 class Graphics(abstract.AbstractTIFFImageModel):
     page = models.ForeignKey(Page, verbose_name=_("page"), blank=True, null=True, on_delete=models.CASCADE, related_name='work_page', db_index=True)
-    label_en = models.CharField( blank=True, null=True, max_length=1024, default="", verbose_name=_("English label"))
-    label_sv = models.CharField( blank=True, null=True, max_length=1024, default="", verbose_name=_("Swedish label"))
+    label_en = models.CharField(blank=True, null=True, max_length=1024, default="", verbose_name=_("English label"))
+    label_sv = models.CharField(blank=True, null=True, max_length=1024, default="", verbose_name=_("Swedish label"))
     bbox = ArrayField(
-            models.FloatField(max_length=10, blank=True, null=True),
+            models.FloatField(max_length=16, blank=True, null=True),
             size=4,
         )
-    score = models.FloatField(max_length=10, blank=True, null=True)
-    input_image = models.ImageField(storage=OriginalFileStorage, upload_to=get_original_path, blank=True, null=True, verbose_name=_("general.file"))
+    score = models.FloatField(max_length=16, blank=True, null=True)
+    input_image = models.URLField(max_length=2048, blank=True, null=True, verbose_name=_("input image"))
 
     def __str__(self) -> str:
         if self.label_sv:
