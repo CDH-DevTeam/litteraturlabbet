@@ -121,3 +121,20 @@ class Graphics(abstract.AbstractTIFFImageModel):
             return f"{self.page}, {self.label_sv}"
         else:
             return f"{self.page}, {self.label_en}"
+
+
+class NearestNeighbours(abstract.AbstractBaseModel):
+    extraction_images = models.ForeignKey(Graphics, on_delete=models.CASCADE, verbose_name=_("extraction images"), related_name="extraction_images")
+    asset_path = models.CharField(max_length=256, default="")
+    image_url = models.URLField(max_length=2048, blank=True, null=True, verbose_name=_("image url"))
+    distance = ArrayField(
+            models.FloatField(max_length=16, blank=True, null=True),
+            size=3,
+        )
+
+    def __str__(self) -> str:     
+        return f"{self.extraction_images}, {self.asset_path}"
+    
+    class Meta:
+        verbose_name = 'Nearest Neighbour'
+        verbose_name_plural = 'Nearest Neighbours'
