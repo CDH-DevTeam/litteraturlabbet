@@ -78,14 +78,26 @@ class GraphicsModel(admin.ModelAdmin):
         return format_html(f'<img src="{settings.IIIF_URL}{obj.iiif_file}/full/full/0/default.jpg" height="100" />')
 
 
-@admin.register(NearestNeighbours)
-class NearestNeighboursAdmin(admin.ModelAdmin):
+@admin.register(ClsuterMeta)
+class ClusterMetaAdmin(admin.ModelAdmin):
 
-    readonly_fields = ['id', *DEFAULT_FIELDS]
-    fields = get_fields(NearestNeighbours, exclude=DEFAULT_EXCLUDE)
+    readonly_fields = [*DEFAULT_FIELDS]
+    fields = get_fields(ClsuterMeta, exclude=DEFAULT_EXCLUDE + ['id'])
     list_display = ['extraction_images', 'distance']
     search_fields = ['extraction_images', 'distance']
     autocomplete_fields = ['extraction_images']
 
     def __str__(self) -> str:
-        return f"{self.id}"
+        return f"{self.extraction_images}"
+    
+@admin.register(NearestNeighbours)
+class NearestNeighboursAdmin(admin.ModelAdmin):
+
+    readonly_fields = [ *DEFAULT_FIELDS]
+    fields = get_fields(NearestNeighbours, exclude=DEFAULT_EXCLUDE + ['id'])
+    list_display = ['image', ]
+    search_fields = ['image',]
+    autocomplete_fields = ['image']
+
+    def __str__(self) -> str:
+        return f"{self.image}"

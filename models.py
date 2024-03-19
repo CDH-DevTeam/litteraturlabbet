@@ -123,9 +123,9 @@ class Graphics(abstract.AbstractTIFFImageModel):
             return f"{self.page}, {self.label_en}"
 
 
-class NearestNeighbours(abstract.AbstractBaseModel):
+class ClsuterMeta(abstract.AbstractBaseModel):
     extraction_images = models.ForeignKey(Graphics, on_delete=models.CASCADE, verbose_name=_("extraction images"), related_name="extraction_images")
-    asset_path = models.CharField(max_length=256, default="")
+    asset_path = models.CharField(max_length=256, null=True, blank=True, default="")
     image_url = models.URLField(max_length=2048, blank=True, null=True, verbose_name=_("image url"))
     distance = ArrayField(
             models.FloatField(max_length=16, blank=True, null=True),
@@ -134,6 +134,18 @@ class NearestNeighbours(abstract.AbstractBaseModel):
 
     def __str__(self) -> str:     
         return f"{self.extraction_images}, {self.asset_path}"
+    
+    class Meta:
+        verbose_name = 'Cluster Mata'
+        verbose_name_plural = 'Cluster Meta'
+
+class NearestNeighbours(abstract.AbstractBaseModel):
+    image = models.ForeignKey(Graphics, on_delete=models.CASCADE, verbose_name=_("image"), related_name="image")
+    neighbours = models.JSONField(blank=True, null=True, verbose_name=_("neighbours"))
+
+
+    def __str__(self) -> str:
+        return f"{self.image}"
     
     class Meta:
         verbose_name = 'Nearest Neighbour'

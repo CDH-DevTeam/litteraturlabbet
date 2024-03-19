@@ -56,6 +56,13 @@ class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
         fields = get_fields(models.Cluster, exclude=DEFAULT_EXCLUDE) + ['segments']
         depth = 4
 
+class ClusterMetaViewSet(DynamicDepthSerializer):
+    
+        class Meta:
+            model = models.ClsuterMeta
+            fields = "__all__"
+
+
 class NearestNeighboursSerializer(DynamicDepthSerializer):
     
         class Meta:
