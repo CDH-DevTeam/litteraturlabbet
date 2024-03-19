@@ -34,9 +34,9 @@ class Author(abstract.AbstractBaseModel, mixins.GenderedMixin):
 class Work(abstract.AbstractBaseModel):
 
     
-    title = models.CharField( blank=True, null=True, max_length=1024, default="", verbose_name=_("title"))
+    title = models.CharField( blank=True, null=True, max_length=2048, default="", verbose_name=_("title"))
     short_title = models.CharField(max_length=256, blank=True, null=True, verbose_name=_("short title"))
-    modernized_title = models.CharField(max_length=1024, blank=True, null=True, verbose_name=_("modernized title"))
+    modernized_title = models.CharField(max_length=2048, blank=True, null=True, verbose_name=_("modernized title"))
 
     # lbworkid = models.CharField(unique=True, max_length=128, verbose_name=_("llbworkid"))
     lbworkid = models.CharField(max_length=128, verbose_name=_("llbworkid"))
