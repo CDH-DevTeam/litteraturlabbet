@@ -116,6 +116,8 @@ class Graphics(abstract.AbstractTIFFImageModel):
     score = models.FloatField(max_length=16, blank=True, null=True)
     input_image = models.URLField(max_length=2048, blank=True, null=True, verbose_name=_("input image"))
 
+    similar_extractions = models.JSONField(blank=True, null=True, verbose_name=_("similars"))
+
     def __str__(self) -> str:
         if self.label_sv:
             return f"{self.page}, {self.label_sv}"
