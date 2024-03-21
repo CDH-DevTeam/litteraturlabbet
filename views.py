@@ -13,7 +13,6 @@ from rest_framework import viewsets, generics, response
 from itertools import combinations
 from .data.upload import *
 
-
 class FragmentFilter(BaseFilterBackend):
 
     search_param = 'search'
@@ -225,7 +224,7 @@ class SegmentViewSet(DynamicDepthViewSet):
 class GraphicViewSet(DynamicDepthViewSet):
     serializer_class = serializers.TIFFGraphicSerializer
     queryset = models.Graphics.objects.all()
-    filterset_fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page'])
+    filterset_fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
 
 
 
