@@ -221,10 +221,7 @@ class SegmentViewSet(DynamicDepthViewSet):
     filter_class = SegmentFilter
     search_fields = ['text']
 
-class GraphicViewSet(DynamicDepthViewSet):
-    serializer_class = serializers.TIFFGraphicSerializer
-    queryset = models.Graphics.objects.all()
-    filterset_fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
+class GraphicFilter(filters.FilterSet):
     year_start = filters.NumberFilter(
         field_name='page__work__imprint_year',
         lookup_expr='gte',
@@ -236,6 +233,7 @@ class GraphicViewSet(DynamicDepthViewSet):
         lookup_expr='lte',
         distinct=True
     )
+
     author = filters.NumberFilter(
         field_name='page__work__main_author__id',
         lookup_expr='exact',
@@ -248,6 +246,18 @@ class GraphicViewSet(DynamicDepthViewSet):
         distinct=True
     )
 
+    class Meta:
+        model = models.Graphics
+        fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
+
+class GraphicViewSet(DynamicDepthViewSet):
+    serializer_class = serializers.TIFFGraphicSerializer
+    queryset = models.Graphics.objects.all()
+    filterset_fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_class = GraphicFilter
+    search_fields = ['label_sv', 'label_en', 'page__work__main_author__id', 'page__work__id', 'page__work__imprint_year']
+    
 class ClusterMetaViewSet(DynamicDepthViewSet):
     serializer_class = serializers.ClusterMetaViewSet
     queryset = models.ClsuterMeta.objects.all()
