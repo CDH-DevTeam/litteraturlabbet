@@ -225,8 +225,28 @@ class GraphicViewSet(DynamicDepthViewSet):
     serializer_class = serializers.TIFFGraphicSerializer
     queryset = models.Graphics.objects.all()
     filterset_fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
+    year_start = filters.NumberFilter(
+        field_name='page__work__imprint_year',
+        lookup_expr='gte',
+        distinct=True
+    )
 
+    year_end = filters.NumberFilter(
+        field_name='page__work__imprint_year',
+        lookup_expr='lte',
+        distinct=True
+    )
+    author = filters.NumberFilter(
+        field_name='page__work__main_author__id',
+        lookup_expr='exact',
+        distinct=True
+    )
 
+    work = filters.NumberFilter(
+        field_name='page__work__id',
+        lookup_expr='exact',
+        distinct=True
+    )
 
 class ClusterMetaViewSet(DynamicDepthViewSet):
     serializer_class = serializers.ClusterMetaViewSet
