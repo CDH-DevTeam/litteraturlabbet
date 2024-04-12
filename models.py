@@ -154,7 +154,7 @@ class Neighbours(abstract.AbstractBaseModel):
 
 class NearestNeighbours(abstract.AbstractBaseModel):
     image = models.ForeignKey(Graphics, on_delete=models.CASCADE, verbose_name=_("image"), related_name="image")
-    neighbours = models.ManyToManyField(Neighbours, verbose_name=_("neighbours"), related_name="neighbours")
+    neighbours = models.ForeignKey(Neighbours, null=True, blank=True, verbose_name=_("neighbours"), related_name="neighbours")
 
     def __str__(self) -> str:
         return f"{self.image}"
