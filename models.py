@@ -141,10 +141,20 @@ class ClsuterMeta(abstract.AbstractBaseModel):
         verbose_name = 'Cluster Mata'
         verbose_name_plural = 'Cluster Meta'
 
+class Neighbours(abstract.AbstractBaseModel):
+    image = models.ForeignKey(Graphics, on_delete=models.CASCADE, verbose_name=_("neighbours"))
+    match_dist = models.FloatField(max_length=16, blank=True, null=True)
+    display = models.BooleanField(default=True)
+
+    def __str__(self) -> str:
+        return f"{self.image}"
+    class Meta:
+        verbose_name = 'Neighbour'
+        verbose_name_plural = 'Neighbours'
+
 class NearestNeighbours(abstract.AbstractBaseModel):
     image = models.ForeignKey(Graphics, on_delete=models.CASCADE, verbose_name=_("image"), related_name="image")
-    neighbours = models.JSONField(blank=True, null=True, verbose_name=_("neighbours"))
-
+    neighbours = models.ManyToManyField(Neighbours, verbose_name=_("neighbours"), related_name="neighbours")
 
     def __str__(self) -> str:
         return f"{self.image}"
@@ -152,3 +162,4 @@ class NearestNeighbours(abstract.AbstractBaseModel):
     class Meta:
         verbose_name = 'Nearest Neighbour'
         verbose_name_plural = 'Nearest Neighbours'
+

@@ -59,6 +59,9 @@ class SegmentAdmin(admin.ModelAdmin):
     fields = get_fields(Segment, exclude=DEFAULT_EXCLUDE)
     autocomplete_fields = ['page', 'cluster']
 
+class NeighboursAdmin(admin.TabularInline):
+    model = Neighbours
+    extra = 1
 
 @admin.register(Graphics)
 class GraphicsModel(admin.ModelAdmin):
@@ -98,6 +101,10 @@ class NearestNeighboursAdmin(admin.ModelAdmin):
     list_display = ['image', ]
     search_fields = ['image',]
     autocomplete_fields = ['image']
+
+    inlines = [
+        NeighboursAdmin,
+    ]
 
     def __str__(self) -> str:
         return f"{self.image}"
