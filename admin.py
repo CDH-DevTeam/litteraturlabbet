@@ -59,10 +59,6 @@ class SegmentAdmin(admin.ModelAdmin):
     fields = get_fields(Segment, exclude=DEFAULT_EXCLUDE)
     autocomplete_fields = ['page', 'cluster']
 
-class NeighboursAdmin(admin.TabularInline):
-    model = Neighbours
-    extra = 1
-
 @admin.register(Graphics)
 class GraphicsModel(admin.ModelAdmin):
 
@@ -98,13 +94,9 @@ class NearestNeighboursAdmin(admin.ModelAdmin):
 
     readonly_fields = [ *DEFAULT_FIELDS]
     fields = get_fields(NearestNeighbours, exclude=DEFAULT_EXCLUDE + ['id'])
-    list_display = ['image', ]
+    list_display = ['image',]
     search_fields = ['image',]
-    autocomplete_fields = ['image']
-
-    inlines = [
-        NeighboursAdmin,
-    ]
+    autocomplete_fields = ['image', 'neighbours']
 
     def __str__(self) -> str:
         return f"{self.image}"
