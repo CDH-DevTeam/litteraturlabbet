@@ -88,7 +88,18 @@ class ClusterMetaAdmin(admin.ModelAdmin):
 
     def __str__(self) -> str:
         return f"{self.extraction_images}"
-    
+@admin.register(Neighbours)
+class NeighboursAdmin(admin.ModelAdmin):
+    readonly_fields = [ *DEFAULT_FIELDS]
+    fields = get_fields(Neighbours, exclude=DEFAULT_EXCLUDE + ['id'])
+    list_display = ['image',]
+    search_fields = ['image',]
+    autocomplete_fields = ['image',]
+
+
+    def __str__(self) -> str:
+        return f"{self.image}"
+
 @admin.register(NearestNeighbours)
 class NearestNeighboursAdmin(admin.ModelAdmin):
 
