@@ -40,7 +40,7 @@ class TIFFGraphicSerializer(DynamicDepthSerializer):
 
     class Meta:
         model = models.Graphics
-        fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE+ ['page__text_vector', 'page__text'])
+        fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE+['similar_extractions'])
 
 
 class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
