@@ -26,7 +26,7 @@ class AuthorSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
     class Meta:
         model = models.Author
-        fields = get_fields(models.Author, exclude=DEFAULT_EXCLUDE)
+        fields = [get_fields(models.Author, exclude=DEFAULT_EXCLUDE)]
         depth = 1
 
 class SegmentSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
@@ -41,6 +41,16 @@ class TIFFGraphicSerializer(DynamicDepthSerializer):
     class Meta:
         model = models.Graphics
         fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE+['similar_extractions'])
+    
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if 'page' in representation:
+            # Exclude 'text' and 'text_vector' fields from the 'page' object
+            page_data = representation['page']
+            page_data.pop('text', None)
+            page_data.pop('text_vector', None)
+        return representation
 
 
 class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
