@@ -37,21 +37,21 @@ class SegmentSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
         # depth = 0
 
 class TIFFGraphicSerializer(DynamicDepthSerializer):
+    page = PageSerializer()  
 
     class Meta:
         model = models.Graphics
         fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE+['similar_extractions'])
-    
+
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        if 'page' in representation:
+        if 'page' in representation and isinstance(representation['page'], dict):
             # Exclude 'text' and 'text_vector' fields from the 'page' object
             page_data = representation['page']
             page_data.pop('text', None)
             page_data.pop('text_vector', None)
         return representation
-
 
 class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
