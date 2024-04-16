@@ -26,7 +26,7 @@ class AuthorSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
     class Meta:
         model = models.Author
-        fields = [get_fields(models.Author, exclude=DEFAULT_EXCLUDE)]
+        fields = get_fields(models.Author, exclude=DEFAULT_EXCLUDE)
         depth = 1
 
 class SegmentSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
