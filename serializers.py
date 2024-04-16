@@ -37,25 +37,25 @@ class SegmentSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
         # depth = 0
 
 class TIFFGraphicSerializer(DynamicDepthSerializer):
-    page = PageSerializer()  
+    # page = PageSerializer()  
 
     class Meta:
         model = models.Graphics
         fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE+['similar_extractions'])
 
 
-    # def to_representation(self, instance):
-    #     representation = super(TIFFGraphicSerializer, self).to_representation(instance)
+    def to_representation(self, instance):
+        representation = super(TIFFGraphicSerializer, self).to_representation(instance)
         
-    #     # Handle depth serialization for related fields
-    #     depth = self.context.get('depth', None)
-    #     if depth is not None:
-    #         if 'page' in representation and isinstance(representation['page'], dict):
-    #             # Apply depth serialization to the 'page' field
-    #             page_data = representation['page']
-    #             page_serializer = PageSerializer(instance.page, context={'depth': depth - 1})
-    #             page_data.update(page_serializer.data)
-    #     return representation
+        # Handle depth serialization for related fields
+        depth = self.context.get('depth', None)
+        if depth is not None:
+            if 'page' in representation and isinstance(representation['page'], dict):
+                # Apply depth serialization to the 'page' field
+                page_data = representation['page']
+                page_serializer = PageSerializer(instance.page, context={'depth': depth - 1})
+                page_data.update(page_serializer.data)
+        return representation
 
 class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
