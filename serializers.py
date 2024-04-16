@@ -44,14 +44,18 @@ class TIFFGraphicSerializer(DynamicDepthSerializer):
         fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE+['similar_extractions'])
 
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        if 'page' in representation and isinstance(representation['page'], dict):
-            # Exclude 'text' and 'text_vector' fields from the 'page' object
-            page_data = representation['page']
-            page_data.pop('text', None)
-            page_data.pop('text_vector', None)
-        return representation
+    # def to_representation(self, instance):
+    #     representation = super(TIFFGraphicSerializer, self).to_representation(instance)
+        
+    #     # Handle depth serialization for related fields
+    #     depth = self.context.get('depth', None)
+    #     if depth is not None:
+    #         if 'page' in representation and isinstance(representation['page'], dict):
+    #             # Apply depth serialization to the 'page' field
+    #             page_data = representation['page']
+    #             page_serializer = PageSerializer(instance.page, context={'depth': depth - 1})
+    #             page_data.update(page_serializer.data)
+    #     return representation
 
 class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
