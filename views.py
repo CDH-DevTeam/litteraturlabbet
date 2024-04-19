@@ -250,6 +250,16 @@ class GraphicFilter(filters.FilterSet):
         model = models.Graphics
         fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
 
+class NeighborFilter(filters.FilterSet):
+    image_id = filters.NumberFilter(
+        field_name='image__id',
+        lookup_expr='exact',
+        distinct=True
+    )
+
+    class Meta:
+        model = models.NearestNeighbours
+        fields = get_fields(models.NearestNeighbours, exclude=DEFAULT_EXCLUDE+['image', 'neighbours'])
 class GraphicViewSet(DynamicDepthViewSet):
     serializer_class = serializers.TIFFGraphicSerializer
     queryset = models.Graphics.objects.all()
@@ -269,7 +279,8 @@ class NearestNeighboursViewSet(DynamicDepthViewSet):
     serializer_class = serializers.NearestNeighboursSerializer
     queryset = models.NearestNeighbours.objects.all()
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    search_fields = ['text']
+    search_fields = ['text', 'image__id']
+    filter_class = NeighborFilter
     filterset_fields = get_fields(models.NearestNeighbours, exclude=DEFAULT_EXCLUDE+['image', 'neighbours'])
 
 class AuthorExchangeView(generics.ListAPIView):
