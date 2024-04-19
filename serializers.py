@@ -77,9 +77,11 @@ class ClusterMetaViewSet(DynamicDepthSerializer):
 
 class NearestNeighboursSerializer(DynamicDepthSerializer):
     
-        class Meta:
-            model = models.NearestNeighbours
-            fields = "__all__"
+    image = TIFFGraphicSerializer()
+
+    class Meta:
+        model = models.NearestNeighbours
+        fields = get_fields(models.NearestNeighbours, exclude=DEFAULT_EXCLUDE)
 
 class AuthorExchangeSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
