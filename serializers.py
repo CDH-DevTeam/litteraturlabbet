@@ -75,13 +75,52 @@ class ClusterMetaViewSet(DynamicDepthSerializer):
             fields = "__all__"
 
 
+class NeighboursSerializer(DynamicDepthSerializer):
+    class Meta(TIFFGraphicSerializer.Meta):
+        exclude = ['similar_extractions'] 
+
+    class Meta:
+        model = models.Neighbours
+        fields = get_fields(models.Neighbours, exclude=DEFAULT_EXCLUDE) 
+
+    def to_representation(self, instance):
+        representation = super(NeighboursSerializer, self).to_representation(instance)
+
+        # Handle depth serialization for related fields
+        depth = self.context.get('depth')
+        if depth is not None:
+            representation['image'] = TIFFGraphicSerializer(instance.image, context={'depth': depth}).data
+            representation['image'].pop('similar_extractions', None)
+
+        return representation
+
+
 class NearestNeighboursSerializer(DynamicDepthSerializer):
     
-    image = TIFFGraphicSerializer()
+    class Meta(TIFFGraphicSerializer.Meta):
+        exclude = ['similar_extractions'] 
+
+    class Meta(NeighboursSerializer.Meta):
+        exclude = ['similar_extractions'] 
 
     class Meta:
         model = models.NearestNeighbours
         fields = get_fields(models.NearestNeighbours, exclude=DEFAULT_EXCLUDE)
+
+    def to_representation(self, instance):
+        representation = super(NearestNeighboursSerializer, self).to_representation(instance)
+
+        # Handle depth serialization for related fields
+        depth = self.context.get('depth')
+        if depth is not None:
+            representation['image'] = TIFFGraphicSerializer(instance.image, context={'depth': depth}).data
+            representation['image'].pop('similar_extractions', None)
+
+            representation['neighbours'] = NeighboursSerializer(instance.neighbours, context={'depth': depth}, many=True).data
+            for neighbour in representation['neighbours']:
+                neighbour.pop('similar_extractions', None)
+
+        return representation
 
 class AuthorExchangeSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
