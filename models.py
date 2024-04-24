@@ -116,7 +116,7 @@ class Graphics(abstract.AbstractTIFFImageModel):
     score = models.FloatField(max_length=16, blank=True, null=True)
     input_image = models.URLField(max_length=2048, blank=True, null=True, verbose_name=_("input image"))
 
-    similar_extractions = models.ManyToManyField("Graphics", blank=True, null=True, verbose_name=_("similars"))
+    similar_extractions = models.ManyToManyField("Graphics", blank=True, verbose_name=_("similars"))
 
     def __str__(self) -> str:
         if self.label_sv:
@@ -154,7 +154,7 @@ class Neighbours(abstract.AbstractBaseModel):
 
 class NearestNeighbours(abstract.AbstractBaseModel):
     image = models.ForeignKey(Graphics, on_delete=models.CASCADE, verbose_name=_("image"), related_name="image")
-    neighbours = models.ManyToManyField(Neighbours, null=True, blank=True, verbose_name=_("neighbours"), related_name="neighbours")
+    neighbours = models.ManyToManyField(Neighbours, blank=True, verbose_name=_("neighbours"), related_name="neighbours")
 
     def __str__(self) -> str:
         return f"{self.image}"
