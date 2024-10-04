@@ -66,7 +66,7 @@ class Work(abstract.AbstractBaseModel):
 class Page(abstract.AbstractDocumentModel):
 
     work = models.ForeignKey(Work, verbose_name=_("work"), on_delete=models.CASCADE, related_name='pages')
-    number = models.PositiveIntegerField(verbose_name=_("page number"))
+    number = models.CharField(max_length=128, verbose_name=_("page number"))
 
     class Meta:
         ordering = ['-number']
@@ -117,6 +117,9 @@ class Graphics(abstract.AbstractTIFFImageModel):
     input_image = models.URLField(max_length=2048, blank=True, null=True, verbose_name=_("input image"))
 
     similar_extractions = models.ManyToManyField("Graphics", blank=True, verbose_name=_("similars"))
+    # Tags list(Many to many relation)(Keywords)
+    # Each taga has a category and keywords (SWE ans ENG)
+    # tags = models.ManyToManyField("Tag", blank=True, verbose_name=_("tags"))
 
     def __str__(self) -> str:
         if self.label_sv:
@@ -141,6 +144,7 @@ class ClsuterMeta(abstract.AbstractBaseModel):
         verbose_name = 'Cluster Mata'
         verbose_name_plural = 'Cluster Meta'
 
+# 
 class Neighbours(abstract.AbstractBaseModel):
     image = models.ForeignKey(Graphics, on_delete=models.CASCADE, verbose_name=_("neighbours"))
     match_dist = models.FloatField(max_length=16, blank=True, null=True)
