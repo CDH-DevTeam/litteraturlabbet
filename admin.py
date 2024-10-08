@@ -39,7 +39,7 @@ class PageAdmin(admin.ModelAdmin):
     readonly_fields = ['id', 'uuid', *DEFAULT_FIELDS]
     fields = get_fields(Page, exclude=DEFAULT_EXCLUDE + ['text_vector'])
     list_display = ['number', 'work',]
-    search_fields = ['id', 'work__name', 'number']
+    search_fields = ['id', 'work__title', 'number']
     autocomplete_fields = ['work']
 
 
