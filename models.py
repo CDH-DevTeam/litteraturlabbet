@@ -105,6 +105,32 @@ class Segment(abstract.AbstractBaseModel):
         return f"{self.page.work.title}, {self.bw}-{self.ew}"
 
 
+class Categories(abstract.AbstractBaseModel):
+    cat_sv = models.CharField(max_length=64, verbose_name=_("category_sv"))
+    cat_en = models.CharField(max_length=64, verbose_name=_("category_en"))
+
+    def __str__(self) -> str:
+        return f"{self.cat_sv}"
+    
+    class Meta:
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
+
+
+class Tags(abstract.AbstractBaseModel):
+    tag_sv = models.CharField(max_length=64, verbose_name=_("tag_sv"))
+    tag_en = models.CharField(max_length=64, verbose_name=_("tag_en"))
+    category = models.ForeignKey(Categories, on_delete=models.CASCADE, verbose_name=_("category"), related_name="category", blank=True, null=True)
+    getty_id = models.CharField(max_length=64, verbose_name=_("getty_id"), blank=True, null=True)
+    
+
+    def __str__(self) -> str:
+        return f"{self.tag_sv}"
+    class Meta:
+        verbose_name = 'Tag'
+        verbose_name_plural = 'Tags'
+
+
 class Graphics(abstract.AbstractTIFFImageModel):
     page = models.ForeignKey(Page, verbose_name=_("page"), blank=True, null=True, on_delete=models.CASCADE, related_name='work_page', db_index=True)
     label_en = models.CharField(blank=True, null=True, max_length=1024, default="", verbose_name=_("English label"))
@@ -117,9 +143,8 @@ class Graphics(abstract.AbstractTIFFImageModel):
     input_image = models.URLField(max_length=2048, blank=True, null=True, verbose_name=_("input image"))
 
     similar_extractions = models.ManyToManyField("Graphics", blank=True, verbose_name=_("similars"))
-    # Tags list(Many to many relation)(Keywords)
-    # Each taga has a category and keywords (SWE ans ENG)
-    # tags = models.ManyToManyField("Tag", blank=True, verbose_name=_("tags"))
+    tags = models.ManyToManyField(Tags, blank=True, verbose_name=_("tags"))
+    display = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         if self.label_sv:
