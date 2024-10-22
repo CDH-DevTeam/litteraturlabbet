@@ -144,7 +144,7 @@ class Graphics(abstract.AbstractTIFFImageModel):
 
     similar_extractions = models.ManyToManyField("Graphics", blank=True, verbose_name=_("similars"))
     tags = models.ManyToManyField(Tags, blank=True, verbose_name=_("tags"))
-    display = models.BooleanField(default=True)
+    display = models.BooleanField(default=True, default=True, blank=True, verbose_name=_("display"))
 
     def __str__(self) -> str:
         if self.label_sv:
@@ -173,7 +173,7 @@ class ClsuterMeta(abstract.AbstractBaseModel):
 class Neighbours(abstract.AbstractBaseModel):
     image = models.ForeignKey(Graphics, on_delete=models.CASCADE, verbose_name=_("neighbours"))
     match_dist = models.FloatField(max_length=16, blank=True, null=True)
-    display = models.BooleanField(default=True)
+    display = models.BooleanField(default=True, null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.image}"
