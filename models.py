@@ -144,7 +144,7 @@ class Graphics(abstract.AbstractTIFFImageModel):
 
     similar_extractions = models.ManyToManyField("Graphics", blank=True, verbose_name=_("similars"))
     tags = models.ManyToManyField(Tags, blank=True, verbose_name=_("tags"))
-    display = models.BooleanField(default=True, default=True, blank=True, verbose_name=_("display"))
+    display = models.BooleanField(default=True, blank=True, verbose_name=_("display"))
 
     def __str__(self) -> str:
         if self.label_sv:
