@@ -37,13 +37,17 @@ class SegmentSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
         # depth = 0
 
 class TIFFGraphicSerializer(DynamicDepthSerializer):
+    similar_extractions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    similar_count = serializers.SerializerMethodField()
+
     class Meta(PageSerializer.Meta):
         exclude = ['text'] 
-
     class Meta:
         model = models.Graphics
-        fields = get_fields(models.Graphics)
+        fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['similar_extractions']) + ['similar_extractions', 'similar_count']
 
+    def get_similar_count(self, instance):
+        return instance.similar_extractions.count()
 
     def to_representation(self, instance):
         representation = super(TIFFGraphicSerializer, self).to_representation(instance)
@@ -53,7 +57,13 @@ class TIFFGraphicSerializer(DynamicDepthSerializer):
         if depth is not None:
             representation['page'] = PageSerializer(instance.page, context={'depth': depth}).data
             representation['page'].pop('text', None)
+
+        # Add similar_count to the representation
+        representation['similar_count'] = self.get_similar_count(instance)
+        
         return representation
+
+
 
 class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
