@@ -12,7 +12,6 @@ from django.db.models import Count, Q
 from rest_framework import viewsets, generics, response
 from itertools import combinations
 from .data.upload import *
-from rest_framework.pagination import PageNumberPagination
 
 
 class FragmentFilter(BaseFilterBackend):
@@ -273,24 +272,15 @@ class NeighborFilter(filters.FilterSet):
         model = models.NearestNeighbours
         fields = get_fields(models.NearestNeighbours, exclude=DEFAULT_EXCLUDE+['image', 'neighbours'])
 
-class SmallResultsSetPagination(PageNumberPagination):
-    page_size = 20  # Adjust as needed
-    page_size_query_param = 'page_size'
-    max_page_size = 100
-
 class GraphicViewSet(DynamicDepthViewSet):
     serializer_class = serializers.TIFFGraphicSerializer
-    queryset = models.Graphics.objects.select_related('page').prefetch_related('similar_extractions', 'tags').order_by('page__work__imprint_year')
-    pagination_class = SmallResultsSetPagination  # Add pagination
+    queryset = models.Graphics.objects.all().order_by('page__work__imprint_year')
     filterset_fields = [
-        'id'
-    ] + get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
+        'id']+get_fields(models.Graphics, 
+                         exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filter_class = GraphicFilter
-    search_fields = [
-        'label_sv', 'label_en', 'page__work__main_author__id', 'page__work__id', 'page__work__imprint_year',
-        'tags__tag_sv', 'tags__tag_en', 'tags__category__cat_sv', 'tags__category__cat_en'
-    ]
+    search_fields = ['label_sv', 'label_en', 'page__work__main_author__id', 'page__work__id', 'page__work__imprint_year', 'tags__tag_sv', 'tags__tag_en', 'tags__category__cat_sv', 'tags__category__cat_en']
     
 class ClusterMetaViewSet(DynamicDepthViewSet):
     serializer_class = serializers.ClusterMetaViewSet
@@ -308,6 +298,42 @@ class NearestNeighboursViewSet(DynamicDepthViewSet):
     filterset_fields = get_fields(models.NearestNeighbours, exclude=DEFAULT_EXCLUDE+['image', 'neighbours'])
 
 class AuthorExchangeView(generics.ListAPIView):
+
+    # serializer_class = serializers.AuthorExchangeSerializer
+    # queryset = models.Cluster.objects\
+    #     .annotate(
+    #         authors=ArrayAgg('segments__page__work__main_author', filter=Q(segments__page__work__main_author__isnull=False), distinct=True),
+    #         count=Count('segments__page__work__main_author', distinct=True))\
+    #     .filter(count__gt=1)\
+    #     .order_by('count')\
+    #     .values()\
+    #     .all()
+
+    # def list(self, request):
+    #     # Note the use of `get_queryset()` instead of `self.queryset`
+    #     queryset = self.get_queryset()
+
+    #     # Flatten the list and make all names unique
+    #     d = {}
+    #     for c in queryset:
+    #         l = c['authors']
+
+    #         for i in l:
+    #             if i not in d.keys():
+    #                 d[i] = {}
+    #             for j in l:
+    #                 if i != j:
+    #                     if j not in d[i].keys():
+    #                         d[i][j] = 0
+    #                     else:
+    #                         d[i][j] += 1
+
+    #     edges = []
+    #     for source, value in d.items():
+    #         for target, weight in value.items():
+    #             if weight > 0:
+    #                 edges.append({"source": source, "target": target, "weight": weight})
+
     queryset = models.Cluster.objects.annotate(
         count=Count('segments__page__work__main_author'),
         authors=ArrayAgg('segments__page__work__main_author'),
