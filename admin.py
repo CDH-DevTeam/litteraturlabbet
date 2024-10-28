@@ -59,6 +59,24 @@ class SegmentAdmin(admin.ModelAdmin):
     fields = get_fields(Segment, exclude=DEFAULT_EXCLUDE)
     autocomplete_fields = ['page', 'cluster']
 
+
+@admin.register(Categories)
+class CategoryAdmin(admin.ModelAdmin):
+
+    readonly_fields = ['id', *DEFAULT_FIELDS]
+    fields = get_fields(Categories, exclude=DEFAULT_EXCLUDE)
+    list_display = ['cat_sv', 'cat_en']
+    search_fields = ['cat_sv', 'cat_en']
+
+@admin.register(Tags)
+class TagsAdmin(admin.ModelAdmin):
+    
+    readonly_fields = ['id', *DEFAULT_FIELDS]
+    fields = get_fields(Tags, exclude=DEFAULT_EXCLUDE)
+    list_display = ['tag_sv', 'tag_en', 'category']
+    search_fields = ['tag_sv', 'tag_en', 'category__cat_sv', 'category__cat_en']
+    autocomplete_fields = ['category']
+
 @admin.register(Graphics)
 class GraphicsModel(admin.ModelAdmin):
 
