@@ -247,7 +247,15 @@ class GraphicFilter(filters.FilterSet):
         distinct=True
     )
 
+    category_sv = filters.CharFilter(
+        field_name='tags__category__cat_sv',
+        lookup_expr='exact'
+    )
 
+    category_en = filters.CharFilter(
+        field_name='tags__category__cat_en',
+        lookup_expr='exact'
+    )
 
     class Meta:
         model = models.Graphics
@@ -263,13 +271,14 @@ class NeighborFilter(filters.FilterSet):
     class Meta:
         model = models.NearestNeighbours
         fields = get_fields(models.NearestNeighbours, exclude=DEFAULT_EXCLUDE+['image', 'neighbours'])
+
 class GraphicViewSet(DynamicDepthViewSet):
     serializer_class = serializers.TIFFGraphicSerializer
-    queryset = models.Graphics.objects.all()
+    queryset = models.Graphics.objects.all().order_by('page__work__imprint_year')
     filterset_fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filter_class = GraphicFilter
-    search_fields = ['label_sv', 'label_en', 'page__work__main_author__id', 'page__work__id', 'page__work__imprint_year']
+    search_fields = ['label_sv', 'label_en', 'page__work__main_author__id', 'page__work__id', 'page__work__imprint_year', 'tags__tag_sv', 'tags__tag_en', 'tags__category__cat_sv', 'tags__category__cat_en']
     
 class ClusterMetaViewSet(DynamicDepthViewSet):
     serializer_class = serializers.ClusterMetaViewSet
