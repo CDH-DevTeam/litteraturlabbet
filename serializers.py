@@ -44,7 +44,7 @@ class TIFFGraphicSerializer(DynamicDepthSerializer):
         exclude = ['text'] 
     class Meta:
         model = models.Graphics
-        fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['similar_extractions']) + ['similar_extractions', 'similar_count']
+        fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['similar_extractions']) + ['similar_count']
 
     def get_similar_count(self, instance):
         return instance.similar_extractions.count()
