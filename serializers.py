@@ -42,7 +42,7 @@ class TIFFGraphicSerializer(DynamicDepthSerializer):
 
     class Meta:
         model = models.Graphics
-        fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE+['similar_extractions'])
+        fields = get_fields(models.Graphics)
 
 
     def to_representation(self, instance):

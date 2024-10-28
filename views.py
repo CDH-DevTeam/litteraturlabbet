@@ -13,6 +13,7 @@ from rest_framework import viewsets, generics, response
 from itertools import combinations
 from .data.upload import *
 
+
 class FragmentFilter(BaseFilterBackend):
 
     search_param = 'search'
@@ -246,9 +247,11 @@ class GraphicFilter(filters.FilterSet):
         distinct=True
     )
 
+
+
     class Meta:
         model = models.Graphics
-        fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
+        fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page'])
 
 class NeighborFilter(filters.FilterSet):
     image_id = filters.NumberFilter(
