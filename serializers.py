@@ -38,7 +38,7 @@ class SegmentSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
 
 class TIFFGraphicSerializer(DynamicDepthSerializer):
-    similar_extractions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    # similar_extractions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     similar_count = serializers.SerializerMethodField()
 
     class Meta:
