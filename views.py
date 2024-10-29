@@ -260,7 +260,7 @@ class GraphicFilter(filters.FilterSet):
 
     class Meta:
         model = models.Graphics
-        fields = get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page'])
+        fields = get_fields(models.Graphics, exclude=DEFAULT_FIELDS + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
 
 class NeighborFilter(filters.FilterSet):
     image_id = filters.NumberFilter(
