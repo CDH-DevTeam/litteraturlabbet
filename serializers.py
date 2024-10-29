@@ -2,7 +2,7 @@ from distutils import dep_util
 from rest_framework import serializers
 from drf_dynamic_fields import DynamicFieldsMixin
 from diana.abstract.serializers import DynamicDepthSerializer
-from diana.utils import DEFAULT_EXCLUDE
+from diana.utils import DEFAULT_EXCLUDE, DEFAULT_FIELDS
 from . import models
 from diana.abstract.models import get_fields
 
@@ -65,7 +65,7 @@ class TIFFGraphicSerializer(DynamicDepthSerializer):
 
     class Meta:
         model = models.Graphics
-        fields = ['id']+get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['similar_extractions']) + ['similar_count']
+        fields = ['id']+get_fields(models.Graphics, exclude=DEFAULT_FIELDS + ['similar_extractions']) + ['similar_count']
     
     def get_similar_count(self, instance):
         # Use annotated similar_count if available

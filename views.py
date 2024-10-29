@@ -6,7 +6,7 @@ from django.contrib.postgres.search import SearchQuery, SearchVector, SearchRank
 from rest_framework.compat import coreapi, coreschema
 from django.utils.encoding import force_str
 from diana.abstract.views import DynamicDepthViewSet
-from diana.abstract.models import get_fields, DEFAULT_EXCLUDE
+from diana.abstract.models import get_fields, DEFAULT_EXCLUDE, DEFAULT_FIELDS
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Count, Q
 from rest_framework import viewsets, generics, response
@@ -287,9 +287,9 @@ class GraphicViewSet(DynamicDepthViewSet):
     )
     pagination_class = StandardResultsSetPagination
     filterset_fields = ['id']+get_fields(models.Graphics, 
-                        exclude=DEFAULT_EXCLUDE + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
+                        exclude=DEFAULT_FIELDS + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filter_class = GraphicFilter
+    # filter_class = GraphicFilter
     # search_fields = ['label_sv', 'label_en', 'page__work__main_author__id', 'page__work__id', 'page__work__imprint_year', 'tags__tag_sv', 'tags__tag_en', 'tags__category__cat_sv', 'tags__category__cat_en']
 
 class ClusterMetaViewSet(DynamicDepthViewSet):
