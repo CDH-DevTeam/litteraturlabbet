@@ -37,31 +37,9 @@ class SegmentSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
         # depth = 0
 
 
-class AuthorSimpleSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
-    
-        class Meta:
-            model = models.Author
-            fields = ['id', 'name', 'birth_year', 'death_year']
-
-class WorkSimpleSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
-    main_author = AuthorSimpleSerializer(read_only=True)
-    class Meta:
-        model = models.Work
-        fields = ['id', 'title', 'main_author', 'authors', 'edition', 'language', 'imprint_year', 'sort_year', 'word_count', 'page_count']
-        depth = 1
-
-
-class PageGraphicSerializer(DynamicDepthSerializer):
-    work = WorkSimpleSerializer(read_only=True)
-    class Meta:
-        model = models.Page
-        fields = ['id', 'work', 'number']
-
-
 class TIFFGraphicSerializer(DynamicDepthSerializer):
-    # similar_extractions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    similar_extractions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     similar_count = serializers.SerializerMethodField()
-    page = PageGraphicSerializer(read_only=True)
 
     class Meta:
         model = models.Graphics
@@ -72,22 +50,21 @@ class TIFFGraphicSerializer(DynamicDepthSerializer):
         return getattr(instance, 'similar_count', 0)
 
 
-    # def to_representation(self, instance):
-    #     representation = super(TIFFGraphicSerializer, self).to_representation(instance)
+    def to_representation(self, instance):
+        representation = super(TIFFGraphicSerializer, self).to_representation(instance)
 
-    #     # Handle depth serialization for related fields
-    #     depth = self.context.get('depth')
-    #     if depth is not None:
-    #         representation['page'] = PageSerializer(instance.page, context={'depth': depth}).data
-    #         representation['page'].pop('text', None)
-    #         representation['page'].pop('text_vector', None)
-    #         representation['page'].pop('excerpts', None)
+        # Handle depth serialization for related fields
+        depth = self.context.get('depth')
+        if depth is not None:
+            representation['page'] = PageSerializer(instance.page, context={'depth': depth}).data
+            representation['page'].pop('text', None)
+            representation['page'].pop('text_vector', None)
+            representation['page'].pop('excerpts', None)
 
-    #     # Add similar_count to the representation
-    #     representation['similar_count'] = self.get_similar_count(instance)
+        # Add similar_count to the representation
+        representation['similar_count'] = self.get_similar_count(instance)
         
-    #     return representation
-
+        return representation
 
 
 class ClusterSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
