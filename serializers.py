@@ -59,13 +59,13 @@ class PageGraphicSerializer(DynamicDepthSerializer):
 
 
 class TIFFGraphicSerializer(DynamicDepthSerializer):
-    similar_extractions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    # similar_extractions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     similar_count = serializers.SerializerMethodField()
     page = PageGraphicSerializer(read_only=True)
 
     class Meta:
         model = models.Graphics
-        fields = ['id']+get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['similar_extractions']) + ['similar_extractions', 'similar_count']
+        fields = ['id']+get_fields(models.Graphics, exclude=DEFAULT_EXCLUDE + ['similar_extractions']) + ['similar_count']
     
     def get_similar_count(self, instance):
         # Use annotated similar_count if available
