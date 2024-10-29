@@ -289,8 +289,8 @@ class GraphicViewSet(DynamicDepthViewSet):
     filterset_fields = ['id']+get_fields(models.Graphics, 
                         exclude=DEFAULT_FIELDS + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    # filter_class = GraphicFilter
-    # search_fields = ['label_sv', 'label_en', 'page__work__main_author__id', 'page__work__id', 'page__work__imprint_year', 'tags__tag_sv', 'tags__tag_en', 'tags__category__cat_sv', 'tags__category__cat_en']
+    filter_class = GraphicFilter
+    search_fields = ['label_sv', 'label_en', 'page__work__main_author__id', 'page__work__id', 'page__work__imprint_year', 'tags__tag_sv', 'tags__tag_en', 'tags__category__cat_sv', 'tags__category__cat_en']
 
 class ClusterMetaViewSet(DynamicDepthViewSet):
     serializer_class = serializers.ClusterMetaViewSet
