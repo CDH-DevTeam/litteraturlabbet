@@ -46,9 +46,7 @@ class TIFFGraphicSerializer(DynamicDepthSerializer):
         fields = ['id']+get_fields(models.Graphics, exclude=DEFAULT_FIELDS + ['similar_extractions']) + ['similar_extractions', 'similar_count']
     
     def get_similar_count(self, instance):
-        # Use annotated similar_count if available
-        return getattr(instance, 'similar_count', 0)
-
+        return instance.similar_extractions.count()
 
     def to_representation(self, instance):
         representation = super(TIFFGraphicSerializer, self).to_representation(instance)
