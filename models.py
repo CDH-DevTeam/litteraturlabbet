@@ -50,7 +50,7 @@ class Work(abstract.AbstractBaseModel):
 
     language = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("language"))
 
-    imprint_year = models.CharField(max_length=128, default=None, blank=True, null=True, verbose_name=_("imprint year"))
+    imprint_year = models.PositiveSmallIntegerField(default=None, blank=True, null=True, verbose_name=_("imprint year"))
     sort_year    = models.PositiveSmallIntegerField(default=None, blank=True, null=True, verbose_name=_("sort year"))
     
     word_count = models.PositiveIntegerField(verbose_name=_("word count"), blank=True, null=True, )
@@ -66,7 +66,7 @@ class Work(abstract.AbstractBaseModel):
 class Page(abstract.AbstractDocumentModel):
 
     work = models.ForeignKey(Work, verbose_name=_("work"), on_delete=models.CASCADE, related_name='pages')
-    number = models.CharField(max_length=128, verbose_name=_("page number"))
+    number = models.PositiveIntegerField(verbose_name=_("page number"))
 
     class Meta:
         ordering = ['-number']
