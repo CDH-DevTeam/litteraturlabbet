@@ -212,6 +212,7 @@ class ClusterViewSet(DynamicDepthViewSet):
 
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filter_class = ClusterFilter
+    filterset_class = ClusterFilter
     ordering = ['-size']
 
 
@@ -221,6 +222,7 @@ class SegmentViewSet(DynamicDepthViewSet):
 
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filter_class = SegmentFilter
+    filterset_class = SegmentFilter
     search_fields = ['text']
 
 class GraphicFilter(filters.FilterSet):
