@@ -167,6 +167,7 @@ class WorkPageViewSet(DynamicDepthViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     # filterset_fields = get_fields(models.Work, exclude=DEFAULT_EXCLUDE + ['page__text_vector'])
     filter_class = WorkFilter
+    filterset_class = WorkFilter
     search_fields = ['title', 'short_title',
                      'modernized_title', 'authors__name']
 
@@ -179,6 +180,7 @@ class Work19thCenturyViewSet(DynamicDepthViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     # filterset_fields = get_fields(models.Work, exclude=DEFAULT_EXCLUDE + ['page__text_vector'])
     filter_class = WorkFilter
+    filterset_class = WorkFilter
     search_fields = ['title', 'short_title',
                      'modernized_title', 'authors__name']
 
@@ -202,6 +204,7 @@ class AuthorViewSet(DynamicDepthViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     # filterset_fields = get_fields(models.Author, exclude=DEFAULT_EXCLUDE)
     filter_class = AuthorFilter
+    filterset_class = AuthorFilter
     search_fields = ['name', 'surname', 'formatted_name']
     ordering = ["formatted_name"]
 
@@ -292,6 +295,7 @@ class GraphicViewSet(DynamicDepthViewSet):
                         exclude=DEFAULT_FIELDS + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filter_class = GraphicFilter
+    filterset_class = GraphicFilter
     search_fields = ['label_sv', 'label_en', 'page__work__main_author__id', 'page__work__id', 'page__work__imprint_year', 'tags__tag_sv', 'tags__tag_en', 'tags__category__cat_sv', 'tags__category__cat_en']
 
 class ClusterMetaViewSet(DynamicDepthViewSet):
@@ -307,6 +311,7 @@ class NearestNeighboursViewSet(DynamicDepthViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['text', 'image__id']
     filter_class = NeighborFilter
+    filterset_class = NeighborFilter
     filterset_fields = get_fields(models.NearestNeighbours, exclude=DEFAULT_EXCLUDE+['image', 'neighbours'])
 
 class AuthorExchangeView(generics.ListAPIView):
