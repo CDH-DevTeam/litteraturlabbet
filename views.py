@@ -279,7 +279,7 @@ class NeighborFilter(filters.FilterSet):
         fields = get_fields(models.NearestNeighbours, exclude=DEFAULT_EXCLUDE+['image', 'neighbours'])
 
 class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 25  # Adjust based on acceptable response time
+    page_size = 15  # Adjust based on acceptable response time
     page_size_query_param = 'page_size'
     max_page_size = 1000
 
