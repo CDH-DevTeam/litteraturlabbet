@@ -285,21 +285,25 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 class GraphicViewSet(DynamicDepthViewSet):
     serializer_class = serializers.TIFFGraphicSerializer
+
     def get_queryset(self):
-        order = self.request.GET["order"]
-        # print(order)
-        if not order:
-            order = "ASC" # default to ascending order
-        sort_order = ""
-        if order == "ASC":
-            sort_order = 'page__work__imprint_year'
-        else:
-            sort_order = '-page__work__imprint_year'
-        queryset = (
-            models.Graphics.objects
-            .select_related('page', 'page__work')
-            .order_by(sort_order)
-        )
+        try:
+            order = self.request.GET["order"]
+            # print(order)
+            if not order:
+                order = "ASC" # default to ascending order
+            sort_order = ""
+            if order == "ASC":
+                sort_order = 'page__work__imprint_year'
+            else:
+                sort_order = '-page__work__imprint_year'
+            queryset = (
+                models.Graphics.objects
+                .select_related('page', 'page__work')
+                .order_by(sort_order)
+            )
+        except:
+            queryset = models.Graphics.objects.all()
         return queryset
     pagination_class = StandardResultsSetPagination
     filterset_fields = ['id']+get_fields(models.Graphics, 
