@@ -278,16 +278,16 @@ class NeighborFilter(filters.FilterSet):
         model = models.NearestNeighbours
         fields = get_fields(models.NearestNeighbours, exclude=DEFAULT_EXCLUDE+['image', 'neighbours'])
 
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10  # Adjust based on acceptable response time
-    page_size_query_param = 'page_size'
-    max_page_size = 1000
+# class StandardResultsSetPagination(PageNumberPagination):
+    # page_size = 10  # Adjust based on acceptable response time
+    # page_size_query_param = 'page_size'
+    # max_page_size = 1000
 
 class GraphicViewSet(DynamicDepthViewSet):
     serializer_class = serializers.TIFFGraphicSerializer
     def get_queryset(self):
         order = self.request.GET["order"]
-        print(order)
+        # print(order)
         if not order:
             order = "ASC" # default to ascending order
         sort_order = ""
@@ -301,7 +301,7 @@ class GraphicViewSet(DynamicDepthViewSet):
             .order_by(sort_order)
         )
         return queryset
-    pagination_class = StandardResultsSetPagination
+    # pagination_class = StandardResultsSetPagination
     filterset_fields = ['id']+get_fields(models.Graphics, 
                         exclude=DEFAULT_FIELDS + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
     filter_backends = [DjangoFilterBackend, SearchFilter]
