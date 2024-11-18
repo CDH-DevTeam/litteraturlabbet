@@ -38,12 +38,12 @@ class SegmentSerializer(DynamicDepthSerializer, DynamicFieldsMixin):
 
 
 class TIFFGraphicSerializer(DynamicDepthSerializer):
-    similar_extractions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    # similar_extractions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     similar_count = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Graphics
-        fields = ['id']+get_fields(models.Graphics, exclude=DEFAULT_FIELDS + ['similar_extractions']) + ['similar_extractions', 'similar_count']
+        fields = ['id']+get_fields(models.Graphics, exclude=DEFAULT_FIELDS + ['similar_extractions']) + ['similar_count']
     
     def get_similar_count(self, instance):
         return instance.similar_extractions.count()
