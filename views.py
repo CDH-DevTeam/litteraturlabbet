@@ -13,6 +13,7 @@ from rest_framework import viewsets, generics, response
 from itertools import combinations
 from .data.upload import *
 from rest_framework.pagination import PageNumberPagination
+from django.db.models import Prefetch
 
 
 class FragmentFilter(BaseFilterBackend):
@@ -287,15 +288,32 @@ class GraphicViewSet(DynamicDepthViewSet):
     serializer_class = serializers.TIFFGraphicSerializer
 
     def get_queryset(self):
+
+        authors_prefetch = Prefetch(
+        'page__work__authors',
+        queryset=models.Author.objects.only('id', 'name')
+        )
+
+        work_prefetch = Prefetch(
+            'page__work',
+            queryset=models.Work.objects.only('id', 'title', 'imprint_year', 'main_author')
+        )
+        categories_prefetch = Prefetch(
+            'tags__category',
+            queryset=models.Categories.objects.only('id', 'cat_sv', 'cat_en')
+        )
+
+
         sort_order = self.request.GET.get("order", "ASC")
         sort_field = "page__work__imprint_year" if sort_order == "ASC" else "-page__work__imprint_year"
 
+
         queryset = (
-            models.Graphics.objects
-            # .filter(page__work__imprint_year__isnull=False)
-            .select_related('page', 'page__work').prefetch_related('page__work__authors', 'tags__category')
-            .order_by(sort_field)
-        )
+                models.Graphics.objects
+                .select_related('page', 'page__work')
+                .prefetch_related(authors_prefetch, work_prefetch, categories_prefetch)
+                .order_by(sort_field)
+)
         return queryset
 
     pagination_class = StandardResultsSetPagination
