@@ -298,15 +298,14 @@ class GraphicViewSet(DynamicDepthViewSet):
             else:
                 sort_order = '-page__work__imprint_year'
             queryset = (
-                models.Graphics.objects.filter(Q(page__work__imprint_year__gte=1800) & Q(page__work__imprint_year__lte=1900))
+                models.Graphics.objects
                 .select_related('page', 'page__work')
                 .order_by(sort_order)
             )
         except:
-            queryset = models.Graphics.objects.filter(
-                Q(page__work__imprint_year__gte=1800) &
-                Q(page__work__imprint_year__lte=1900))
+            queryset = models.Graphics.objects.all()
         return queryset
+    
     pagination_class = StandardResultsSetPagination
     filterset_fields = ['id']+get_fields(models.Graphics, 
                         exclude=DEFAULT_FIELDS + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
