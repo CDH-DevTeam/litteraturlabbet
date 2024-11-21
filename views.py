@@ -293,7 +293,7 @@ class GraphicViewSet(DynamicDepthViewSet):
         queryset = (
             models.Graphics.objects
             # .filter(page__work__imprint_year__isnull=False)
-            .select_related('page', 'page__work').prefetch_related('page__work__authors', 'tags__category', 'similar_extractions')
+            .select_related('page', 'page__work').prefetch_related('page__work__authors', 'tags__category')
             .order_by(sort_field)
         )
         return queryset
