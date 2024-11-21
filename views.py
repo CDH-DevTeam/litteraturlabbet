@@ -292,7 +292,7 @@ class GraphicViewSet(DynamicDepthViewSet):
         
         queryset = (
             models.Graphics.objects
-            .filter(page__work__imprint_year__isnull=False)
+            # .filter(page__work__imprint_year__isnull=False)
             .select_related('page', 'page__work')
             .order_by(sort_field)
         )
