@@ -211,7 +211,7 @@ class AuthorViewSet(DynamicDepthViewSet):
 
 
 class ClusterViewSet(DynamicDepthViewSet):
-    queryset = models.Cluster.objects.all()
+    queryset = models.Cluster.objects.prefetch_related('segments__page__work__authors', 'segments__page__work__main_author', 'segments__series__main_author', 'segments__series__authors').all()
     serializer_class = serializers.ClusterSerializer
 
     filter_backends = [DjangoFilterBackend, OrderingFilter]
