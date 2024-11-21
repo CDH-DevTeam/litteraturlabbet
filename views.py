@@ -287,23 +287,15 @@ class GraphicViewSet(DynamicDepthViewSet):
     serializer_class = serializers.TIFFGraphicSerializer
 
     def get_queryset(self):
-        try:
-            order = self.request.GET["order"]
-            # print(order)
-            if not order:
-                order = "ASC" # default to ascending order
-            sort_order = ""
-            if order == "ASC":
-                sort_order = 'page__work__imprint_year'
-            else:
-                sort_order = '-page__work__imprint_year'
-            queryset = (
-                models.Graphics.objects
-                .select_related('page', 'page__work')
-                .order_by(sort_order)
-            )
-        except:
-            queryset = models.Graphics.objects.all()
+        sort_order = self.request.GET.get("order", "ASC")
+        sort_field = "page__work__imprint_year" if sort_order == "ASC" else "-page__work__imprint_year"
+        
+        queryset = (
+            models.Graphics.objects
+            .filter(page__work__imprint_year__isnull=False)
+            .select_related('page', 'page__work')
+            .order_by(sort_field)
+        )
         return queryset
     
     pagination_class = StandardResultsSetPagination
