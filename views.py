@@ -315,7 +315,8 @@ class ClusterMetaViewSet(DynamicDepthViewSet):
 
 class NearestNeighboursViewSet(DynamicDepthViewSet):
     serializer_class = serializers.NearestNeighboursSerializer
-    queryset = models.NearestNeighbours.objects.all()
+    queryset = models.NearestNeighbours.objects.prefetch_related('image__page', 'image__tags', 'image__similar_extractions',
+                                                                 'neighbours__image__page', 'neighbours__image__tags', 'neighbours__image__similar_extractions').all()
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['text', 'image__id']
     filter_class = NeighborFilter
