@@ -289,15 +289,15 @@ class GraphicViewSet(DynamicDepthViewSet):
     def get_queryset(self):
         sort_order = self.request.GET.get("order", "ASC")
         sort_field = "page__work__imprint_year" if sort_order == "ASC" else "-page__work__imprint_year"
-        
+
         queryset = (
             models.Graphics.objects
             # .filter(page__work__imprint_year__isnull=False)
-            .select_related('page', 'page__work')
+            .select_related('page', 'page__work').prefetch_related('page__work__authors', 'tags__category', 'similar_extractions')
             .order_by(sort_field)
         )
         return queryset
-    
+
     pagination_class = StandardResultsSetPagination
     filterset_fields = ['id']+get_fields(models.Graphics, 
                         exclude=DEFAULT_FIELDS + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
