@@ -12,7 +12,7 @@ from django.db.models import Count, Q
 from rest_framework import viewsets, generics, response
 from itertools import combinations
 from .data.upload import *
-from rest_framework.pagination import PageNumberPagination
+# from rest_framework.pagination import PageNumberPagination
 from django.db.models import Prefetch
 
 
@@ -279,10 +279,10 @@ class NeighborFilter(filters.FilterSet):
         model = models.NearestNeighbours
         fields = get_fields(models.NearestNeighbours, exclude=DEFAULT_EXCLUDE+['image', 'neighbours'])
 
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 20  # Adjust based on acceptable response time
-    page_size_query_param = 'page_size'
-    max_page_size = 1000
+# class StandardResultsSetPagination(PageNumberPagination):
+#     page_size = 20  # Adjust based on acceptable response time
+#     page_size_query_param = 'page_size'
+#     max_page_size = 1000
 
 class GraphicViewSet(DynamicDepthViewSet):
     serializer_class = serializers.TIFFGraphicSerializer
@@ -316,7 +316,7 @@ class GraphicViewSet(DynamicDepthViewSet):
 )
         return queryset
 
-    pagination_class = StandardResultsSetPagination
+    # pagination_class = StandardResultsSetPagination
     filterset_fields = ['id']+get_fields(models.Graphics, 
                         exclude=DEFAULT_FIELDS + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
     filter_backends = [DjangoFilterBackend, SearchFilter]
