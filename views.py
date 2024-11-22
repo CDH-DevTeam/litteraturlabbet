@@ -12,7 +12,7 @@ from django.db.models import Count, Q
 from rest_framework import viewsets, generics, response
 from itertools import combinations
 from .data.upload import *
-from rest_framework.pagination import PageNumberPagination
+from django.db.models import Prefetch
 
 
 class FragmentFilter(BaseFilterBackend):
@@ -210,7 +210,7 @@ class AuthorViewSet(DynamicDepthViewSet):
 
 
 class ClusterViewSet(DynamicDepthViewSet):
-    queryset = models.Cluster.objects.all()
+    queryset = models.Cluster.objects.prefetch_related('segments__page__work__authors', 'segments__page__work__main_author', 'segments__series__main_author', 'segments__series__authors').all()
     serializer_class = serializers.ClusterSerializer
 
     filter_backends = [DjangoFilterBackend, OrderingFilter]
@@ -278,30 +278,39 @@ class NeighborFilter(filters.FilterSet):
         model = models.NearestNeighbours
         fields = get_fields(models.NearestNeighbours, exclude=DEFAULT_EXCLUDE+['image', 'neighbours'])
 
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10  # Adjust based on acceptable response time
-    page_size_query_param = 'page_size'
-    max_page_size = 1000
-
 class GraphicViewSet(DynamicDepthViewSet):
     serializer_class = serializers.TIFFGraphicSerializer
+
     def get_queryset(self):
-        order = self.request.GET["order"]
-        print(order)
-        if not order:
-            order = "ASC" # default to ascending order
-        sort_order = ""
-        if order == "ASC":
-            sort_order = 'page__work__imprint_year'
-        else:
-            sort_order = '-page__work__imprint_year'
-        queryset = (
-            models.Graphics.objects
-            .select_related('page', 'page__work')
-            .order_by(sort_order)
+
+        authors_prefetch = Prefetch(
+        'page__work__authors',
+        queryset=models.Author.objects.only('id', 'name')
         )
+
+        work_prefetch = Prefetch(
+            'page__work',
+            queryset=models.Work.objects.only('id', 'title', 'imprint_year', 'main_author')
+        )
+        categories_prefetch = Prefetch(
+            'tags__category',
+            queryset=models.Categories.objects.only('id', 'cat_sv', 'cat_en')
+        )
+
+
+        sort_order = self.request.GET.get("order", "ASC")
+        sort_field = "page__work__imprint_year" if sort_order == "ASC" else "-page__work__imprint_year"
+
+
+        queryset = (
+                models.Graphics.objects.filter(
+                Q(page__work__imprint_year__gte=1800 )and Q(page__work__imprint_year__lte=1900))
+                .select_related('page', 'page__work')
+                .prefetch_related(authors_prefetch, work_prefetch, categories_prefetch)
+                .order_by(sort_field)
+)
         return queryset
-    pagination_class = StandardResultsSetPagination
+
     filterset_fields = ['id']+get_fields(models.Graphics, 
                         exclude=DEFAULT_FIELDS + ['iiif_file', 'file', 'input_image', 'bbox', 'page', 'similar_extractions'])
     filter_backends = [DjangoFilterBackend, SearchFilter]
@@ -318,7 +327,8 @@ class ClusterMetaViewSet(DynamicDepthViewSet):
 
 class NearestNeighboursViewSet(DynamicDepthViewSet):
     serializer_class = serializers.NearestNeighboursSerializer
-    queryset = models.NearestNeighbours.objects.all()
+    queryset = models.NearestNeighbours.objects.prefetch_related('image__page', 'image__tags', 'image__similar_extractions',
+                                                                 'neighbours__image__page', 'neighbours__image__tags', 'neighbours__image__similar_extractions').all()
     filter_backends = [DjangoFilterBackend, SearchFilter]
     search_fields = ['text', 'image__id']
     filter_class = NeighborFilter
@@ -391,7 +401,7 @@ class AuthorExchangeView(generics.ListAPIView):
                     edges.append(
                         {"source": source, "target": target, "weight": weight})
         elapsed_time = time.process_time() - t
-        print(elapsed_time)
+        # print(elapsed_time)
         serializer = serializers.TargetSourceSerializer(edges, many=True)
 
         return response.Response(serializer.data)
