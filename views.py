@@ -304,11 +304,12 @@ class GraphicViewSet(DynamicDepthViewSet):
 
         queryset = (
                 models.Graphics.objects.filter(
-                Q(page__work__imprint_year__gte=1800 )and Q(page__work__imprint_year__lte=1900))
+                Q(page__work__imprint_year__gte=1800 ) and Q(page__work__imprint_year__lte=1900))
                 .select_related('page', 'page__work')
                 .prefetch_related(authors_prefetch, work_prefetch, categories_prefetch)
                 .order_by(sort_field)
-)
+                .distinct()
+        )
         return queryset
 
     filterset_fields = ['id']+get_fields(models.Graphics, 
